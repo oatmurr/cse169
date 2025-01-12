@@ -22,7 +22,8 @@ public:
     ~Cube();
 
     void draw(const glm::mat4& viewProjMtx, GLuint shader);
-    void update();
+    // void update();
+    void update(const glm::mat4& model);
 
     void spin(float deg);
 };

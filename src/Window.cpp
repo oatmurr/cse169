@@ -6,7 +6,8 @@ int Window::height;
 const char* Window::windowTitle = "Model Environment";
 
 // Objects to render
-Cube* Window::cube;
+// Cube* Window::cube;
+Skeleton* Window::skeleton;
 
 // Camera Properties
 Camera* Cam;
@@ -34,15 +35,17 @@ bool Window::initializeProgram() {
 
 bool Window::initializeObjects() {
     // Create a cube
-    cube = new Cube();
+    // cube = new Cube();
     // cube = new Cube(glm::vec3(-1, 0, -2), glm::vec3(1, 1, 1));
+    skeleton = new Skeleton();
 
     return true;
 }
 
 void Window::cleanUp() {
     // Deallcoate the objects.
-    delete cube;
+    // delete cube;
+    delete skeleton;
 
     // Delete the shader program.
     glDeleteProgram(shaderProgram);
@@ -116,7 +119,8 @@ void Window::idleCallback() {
     // Perform any updates as necessary.
     Cam->Update();
 
-    cube->update();
+    // cube->update();
+    skeleton->Update();
 }
 
 void Window::displayCallback(GLFWwindow* window) {
@@ -124,7 +128,8 @@ void Window::displayCallback(GLFWwindow* window) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Render the object.
-    cube->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+    // cube->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+    skeleton->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
 
     // Gets events, including input such as keyboard and mouse or window resizing.
     glfwPollEvents();

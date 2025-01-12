@@ -1,9 +1,8 @@
 #pragma once
 
 #include "Camera.h"
-#include "Cube.h"
 #include "Shader.h"
-#include "core.h"
+#include "Skeleton.h"
 
 class Window {
 public:
@@ -13,12 +12,13 @@ public:
     static const char* windowTitle;
 
     // Objects to render
-    static Cube* cube;
+    // static Cube* cube;
+    static Skeleton* skeleton;
 
     // Shader Program
     static GLuint shaderProgram;
 
-    // Act as Constructors and desctructors
+    // Act as Constructors and destructors
     static bool initializeProgram();
     static bool initializeObjects();
     static void cleanUp();

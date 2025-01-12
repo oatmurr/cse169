@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core.h"
+#include "Cube.h"
 #include "Tokenizer.h"
 
 class DOF {

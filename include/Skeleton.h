@@ -1,9 +1,6 @@
 #pragma once
 
-#include "core.h"
-#include "DOF.h"
 #include "Joint.h"
-#include "Tokenizer.h"
 
 class Skeleton {
 private:
@@ -18,5 +15,5 @@ public:
     // functions
     bool Load(const char* filename);
     void Update(); // traverse tree and compute all join matrices
-    void Draw();
+    void Draw(const glm::mat4& viewProjMtx, GLuint shader);
 };

@@ -1,11 +1,7 @@
 #pragma once
 
-#include <vector>
-
-#include "core.h"
-#include "Tokenizer.h"
 #include "DOF.h"
-
+#include "glm/gtc/matrix_transform.hpp"
 
 class Joint {
 private:
@@ -36,7 +32,7 @@ public:
 
     // functions
     bool Load(Tokenizer& token);
-    void Update(glm::mat4& parent);  // recursively generate local matrix & concatenate    void load();
+    void Update(glm::mat4& parentWorld);  // recursively generate local matrix & concatenate    void load();
     void AddChild(Joint* child);
-    void Draw();
+    void Draw(const glm::mat4& viewProjMtx, GLuint shader);
 };

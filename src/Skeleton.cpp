@@ -25,9 +25,10 @@ bool Skeleton::Load(const char* filename) {
 
 void Skeleton::Update() {
     // traverse tree and update all joint matrices
-    root->Update();
+    glm::mat4 identity = glm::mat4(1.0f);
+    root->Update(identity);
 }
 
-void Skeleton::Draw() {
-    root->Draw();
+void Skeleton::Draw(const glm::mat4& viewProjMtx, GLuint shader) {
+    root->Draw(viewProjMtx, shader);
 }
