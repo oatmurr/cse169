@@ -38,7 +38,6 @@ bool Window::initializeObjects() {
     // cube = new Cube();
     // cube = new Cube(glm::vec3(-1, 0, -2), glm::vec3(1, 1, 1));
     skeleton = new Skeleton();
-
     return true;
 }
 

@@ -1,5 +1,6 @@
 #include "Window.h"
 #include "core.h"
+#include <iostream>
 
 void error_callback(int error, const char* description) {
     // Print error.
@@ -43,7 +44,7 @@ void print_versions() {
 #endif
 }
 
-int main(void) {
+int main(int argc, char* argv[]) {
     // Create the GLFW window.
     GLFWwindow* window = Window::createWindow(800, 600);
     if (!window) exit(EXIT_FAILURE);
@@ -59,6 +60,8 @@ int main(void) {
     if (!Window::initializeProgram()) exit(EXIT_FAILURE);
     // Initialize objects/pointers for rendering; exit if initialization fails.
     if (!Window::initializeObjects()) exit(EXIT_FAILURE);
+
+    Window::skeleton->Load(argv[1]);
 
     // Loop while GLFW window should stay open.
     while (!glfwWindowShouldClose(window)) {
