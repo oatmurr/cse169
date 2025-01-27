@@ -2,65 +2,73 @@ CC = g++
 
 BREW = $(shell brew --prefix)
 
+# obj directory to keep root clean
+OBJDIR = obj
+
 CFLAGS = -g -std=c++11 -Wno-deprecated-declarations
 INCFLAGS = -Iinclude -I$(BREW)/include -Iinclude/imgui -Iinclude/backends
 LDFLAGS = -framework OpenGL -L$(BREW)/lib -lglfw
 
 RM = /bin/rm -f
 
+$(OBJDIR):
+	mkdir -p $(OBJDIR)
+
+.DEFAULT_GOAL := all
 all: menv
-menv: main.o Camera.o Cube.o Shader.o Tokenizer.o Window.o DOF.o Joint.o Skeleton.o imgui.o imgui_demo.o imgui_draw.o imgui_tables.o imgui_widgets.o imgui_impl_glfw.o imgui_impl_opengl3.o
-	$(CC) -o menv main.o Camera.o Cube.o Shader.o Tokenizer.o Window.o DOF.o Joint.o Skeleton.o imgui.o imgui_demo.o imgui_draw.o imgui_tables.o imgui_widgets.o imgui_impl_glfw.o imgui_impl_opengl3.o $(LDFLAGS)
+menv: $(OBJDIR)/main.o $(OBJDIR)/Camera.o $(OBJDIR)/Cube.o $(OBJDIR)/Shader.o $(OBJDIR)/Tokenizer.o $(OBJDIR)/Window.o $(OBJDIR)/DOF.o $(OBJDIR)/Joint.o $(OBJDIR)/Skeleton.o $(OBJDIR)/imgui.o $(OBJDIR)/imgui_demo.o $(OBJDIR)/imgui_draw.o $(OBJDIR)/imgui_tables.o $(OBJDIR)/imgui_widgets.o $(OBJDIR)/imgui_impl_glfw.o $(OBJDIR)/imgui_impl_opengl3.o
+	$(CC) -o menv $(OBJDIR)/*.o $(LDFLAGS)
 
 # project 1
-main.o: main.cpp include/Window.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c main.cpp
+$(OBJDIR)/main.o: main.cpp include/Window.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c main.cpp -o $(OBJDIR)/main.o
 
-Camera.o: src/Camera.cpp include/Camera.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Camera.cpp
+$(OBJDIR)/Camera.o: src/Camera.cpp include/Camera.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Camera.cpp -o $(OBJDIR)/Camera.o
 
-Cube.o: src/Cube.cpp include/Cube.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Cube.cpp
+$(OBJDIR)/Cube.o: src/Cube.cpp include/Cube.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Cube.cpp -o $(OBJDIR)/Cube.o
 
-Shader.o: src/Shader.cpp include/Shader.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Shader.cpp
+$(OBJDIR)/Shader.o: src/Shader.cpp include/Shader.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Shader.cpp -o $(OBJDIR)/Shader.o
 
-Tokenizer.o: src/Tokenizer.cpp include/Tokenizer.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Tokenizer.cpp
+$(OBJDIR)/Tokenizer.o: src/Tokenizer.cpp include/Tokenizer.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Tokenizer.cpp -o $(OBJDIR)/Tokenizer.o
 
-Window.o: src/Window.cpp include/Window.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Window.cpp
+$(OBJDIR)/Window.o: src/Window.cpp include/Window.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Window.cpp -o $(OBJDIR)/Window.o
 
-DOF.o: src/DOF.cpp include/DOF.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c src/DOF.cpp
+$(OBJDIR)/DOF.o: src/DOF.cpp include/DOF.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/DOF.cpp -o $(OBJDIR)/DOF.o
 
-Joint.o: src/Joint.cpp include/Joint.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Joint.cpp
+$(OBJDIR)/Joint.o: src/Joint.cpp include/Joint.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Joint.cpp -o $(OBJDIR)/Joint.o
 
-Skeleton.o: src/Skeleton.cpp include/Skeleton.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Skeleton.cpp
+$(OBJDIR)/Skeleton.o: src/Skeleton.cpp include/Skeleton.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Skeleton.cpp -o $(OBJDIR)/Skeleton.o
 
 # imgui
-imgui.o: include/imgui/imgui.cpp include/imgui/imgui.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c include/imgui/imgui.cpp
+$(OBJDIR)/imgui.o: include/imgui/imgui.cpp include/imgui/imgui.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c include/imgui/imgui.cpp -o $(OBJDIR)/imgui.o
 
-imgui_demo.o: include/imgui/imgui_demo.cpp include/imgui/imgui.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c include/imgui/imgui_demo.cpp
+$(OBJDIR)/imgui_demo.o: include/imgui/imgui_demo.cpp include/imgui/imgui.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c include/imgui/imgui_demo.cpp -o $(OBJDIR)/imgui_demo.o
 
-imgui_draw.o: include/imgui/imgui_draw.cpp include/imgui/imgui.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c include/imgui/imgui_draw.cpp
+$(OBJDIR)/imgui_draw.o: include/imgui/imgui_draw.cpp include/imgui/imgui.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c include/imgui/imgui_draw.cpp -o $(OBJDIR)/imgui_draw.o
 
-imgui_tables.o: include/imgui/imgui_tables.cpp include/imgui/imgui.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c include/imgui/imgui_tables.cpp
+$(OBJDIR)/imgui_tables.o: include/imgui/imgui_tables.cpp include/imgui/imgui.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c include/imgui/imgui_tables.cpp -o $(OBJDIR)/imgui_tables.o
 
-imgui_widgets.o: include/imgui/imgui_widgets.cpp include/imgui/imgui.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c include/imgui/imgui_widgets.cpp
+$(OBJDIR)/imgui_widgets.o: include/imgui/imgui_widgets.cpp include/imgui/imgui.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c include/imgui/imgui_widgets.cpp -o $(OBJDIR)/imgui_widgets.o
 
-imgui_impl_glfw.o: include/backends/imgui_impl_glfw.cpp include/backends/imgui_impl_glfw.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c include/backends/imgui_impl_glfw.cpp
+$(OBJDIR)/imgui_impl_glfw.o: include/backends/imgui_impl_glfw.cpp include/backends/imgui_impl_glfw.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c include/backends/imgui_impl_glfw.cpp -o $(OBJDIR)/imgui_impl_glfw.o
 
-imgui_impl_opengl3.o: include/backends/imgui_impl_opengl3.cpp include/backends/imgui_impl_opengl3.h
-	$(CC) $(CFLAGS) $(INCFLAGS) -c include/backends/imgui_impl_opengl3.cpp
+$(OBJDIR)/imgui_impl_opengl3.o: include/backends/imgui_impl_opengl3.cpp include/backends/imgui_impl_opengl3.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c include/backends/imgui_impl_opengl3.cpp -o $(OBJDIR)/imgui_impl_opengl3.o
 
-clean: 
-	$(RM) *.o menv
+clean:
+	$(RM) $(OBJDIR)/*.o menv
+	rmdir $(OBJDIR)
