@@ -4,6 +4,11 @@
 #include "Shader.h"
 #include "Skeleton.h"
 
+// imgui stuff
+#include "imgui/imgui.h"
+#include "backends/imgui_impl_glfw.h"
+#include "backends/imgui_impl_opengl3.h"
+
 class Window {
 public:
     // Window Properties
@@ -19,7 +24,8 @@ public:
     static GLuint shaderProgram;
 
     // Act as Constructors and destructors
-    static bool initializeProgram();
+    // static bool initializeProgram();
+    static bool initializeProgram(GLFWwindow* window);
     static bool initializeObjects();
     static void cleanUp();
 
@@ -38,4 +44,8 @@ public:
     static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
     static void mouse_callback(GLFWwindow* window, int button, int action, int mods);
     static void cursor_callback(GLFWwindow* window, double currX, double currY);
+
+    // jointList for imgui
+    static std::vector<Joint*> jointList;
+    static void RenderJointControls();
 };

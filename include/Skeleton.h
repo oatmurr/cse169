@@ -16,4 +16,8 @@ public:
     bool Load(const char* filename);
     void Update(); // traverse tree and compute all join matrices
     void Draw(const glm::mat4& viewProjMtx, GLuint shader);
+
+    // added when implementing gui (imgui)
+    // populate joint list for imgui
+    void PopulateJointList(std::vector<Joint*>& jointList);
 };

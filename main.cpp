@@ -57,11 +57,13 @@ int main(int argc, char* argv[]) {
     setup_opengl_settings();
 
     // Initialize the shader program; exit if initialization fails.
-    if (!Window::initializeProgram()) exit(EXIT_FAILURE);
+    // if (!Window::initializeProgram()) exit(EXIT_FAILURE);
+    if (!Window::initializeProgram(window)) exit(EXIT_FAILURE);
     // Initialize objects/pointers for rendering; exit if initialization fails.
     if (!Window::initializeObjects()) exit(EXIT_FAILURE);
 
     Window::skeleton->Load(argv[1]);
+    Window::skeleton->PopulateJointList(Window::jointList);
 
     // Loop while GLFW window should stay open.
     while (!glfwWindowShouldClose(window)) {

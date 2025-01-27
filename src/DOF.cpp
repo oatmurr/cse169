@@ -28,3 +28,11 @@ void DOF::SetMinMax(GLfloat min, GLfloat max) {
     this->min = min;
     this->max = max;
 }
+
+float DOF::GetMin() {
+    return this->min;
+}
+
+float DOF::GetMax() {
+    return this->max;
+}

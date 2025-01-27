@@ -56,3 +56,10 @@ void Skeleton::Draw(const glm::mat4& viewProjMtx, GLuint shader) {
     root->Draw(viewProjMtx, shader);
     printf("Skeleton::Draw - finished drawing skeleton\n");
 }
+
+void Skeleton::PopulateJointList(std::vector<Joint*>& jointList) {
+    printf("Skeleton::PopulateJointList - populating joint list\n");
+    if (root) {
+        root->PopulateJointList(jointList);
+    }
+}

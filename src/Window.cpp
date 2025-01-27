@@ -19,10 +19,23 @@ int MouseX, MouseY;
 // The shader program id
 GLuint Window::shaderProgram;
 
+// imgui stuff
+static Joint* selectedJoint = nullptr;
+static int currentJointIndex = 0;
+std::vector<Joint*> Window::jointList;
+
 // Constructors and desctructors
-bool Window::initializeProgram() {
+// bool Window::initializeProgram() {
+bool Window::initializeProgram(GLFWwindow* window) {
     // Create a shader program with a vertex shader and a fragment shader.
     shaderProgram = LoadShaders("shaders/shader.vert", "shaders/shader.frag");
+
+    // set up imgui
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 330");
 
     // Check the shader program.
     if (!shaderProgram) {
@@ -48,6 +61,11 @@ void Window::cleanUp() {
 
     // Delete the shader program.
     glDeleteProgram(shaderProgram);
+
+    // imgui stuff
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 }
 
 // for the Window
@@ -123,12 +141,32 @@ void Window::idleCallback() {
 }
 
 void Window::displayCallback(GLFWwindow* window) {
+    
+    // imgui new frame
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+    
     // Clear the color and depth buffers.
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // Render the object.
     // cube->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
     skeleton->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+
+    // create imgui window
+    ImGui::Begin("joints");
+
+    RenderJointControls();
+
+    ImGui::End();
+
+    ImGui::ShowDemoWindow();
+
+    // render ui
+    ImGui::Render();
+
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     // Gets events, including input such as keyboard and mouse or window resizing.
     glfwPollEvents();
@@ -194,5 +232,83 @@ void Window::cursor_callback(GLFWwindow* window, double currX, double currY) {
         const float rate = 0.005f;
         float dist = glm::clamp(Cam->GetDistance() * (1.0f - dx * rate), 0.01f, 1000.0f);
         Cam->SetDistance(dist);
+    }
+}
+
+void Window::RenderJointControls() {
+    
+    if (ImGui::Button("previous joint") && currentJointIndex > 0) {
+        currentJointIndex--;
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("next joint") && currentJointIndex < jointList.size() - 1) {
+        currentJointIndex++;
+    }
+    
+    if (!jointList.empty()) {
+        // get the selected joint
+        selectedJoint = jointList[currentJointIndex];
+        ImGui::Text("selected joint: %s", selectedJoint->GetName().c_str());
+
+        // x-rotation
+        float x = selectedJoint->GetDOF(0).GetValue();
+
+        if (ImGui::Button("-##x")) {
+            x -= 0.1f;
+            selectedJoint->GetDOF(0).SetValue(x);
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("+##x")) {
+            x += 0.1f;
+            selectedJoint->GetDOF(0).SetValue(x);
+        }
+
+        if (ImGui::InputFloat("x-rotation", &x)) {
+            selectedJoint->GetDOF(0).SetValue(x);
+        }
+
+        // y-rotation
+        float y = selectedJoint->GetDOF(1).GetValue();
+
+        if (ImGui::Button("-##y")) {
+            y -= 0.1f;
+            selectedJoint->GetDOF(1).SetValue(y);
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("+##y")) {
+            y += 0.1f;
+            selectedJoint->GetDOF(1).SetValue(y);
+        }
+
+        if (ImGui::InputFloat("y-rotation", &y)) {
+            selectedJoint->GetDOF(1).SetValue(y);
+        }
+
+        // z-rotation
+        float z = selectedJoint->GetDOF(2).GetValue();
+
+        if (ImGui::Button("-##z")) {
+            z -= 0.1f;
+            selectedJoint->GetDOF(2).SetValue(z);
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("+##z")) {
+            z += 0.1f;
+            selectedJoint->GetDOF(2).SetValue(z);
+        }
+
+        if (ImGui::InputFloat("z-rotation", &z)) {
+            selectedJoint->GetDOF(2).SetValue(z);
+        }
+
+        
     }
 }

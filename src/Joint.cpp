@@ -22,6 +22,12 @@ Joint::~Joint() {
 
 bool Joint::Load(Tokenizer& token) {
     printf("Joint::Load - loading joint data\n");
+    
+    // get joint name
+    char nameBuffer[256];
+    token.GetToken(nameBuffer);
+    name = std::string(nameBuffer);
+    
     // find '{' token
     token.FindToken("{");
 
@@ -95,12 +101,13 @@ void Joint::Update(glm::mat4& parentWorld) {
     // compute local matrix L
     // initialize local matrix with identity matrix and translate by offset vector
     localMatrix = glm::translate(glm::mat4(1.0f), offset);
-    // rotate around x-axis (pitch) using first pose x value
-    localMatrix = glm::rotate(localMatrix, pose[0].GetValue(), glm::vec3(1.0f, 0.0f, 0.0f));
-    // rotate around y-axis (yaw) using second pose y value
-    localMatrix = glm::rotate(localMatrix, pose[1].GetValue(), glm::vec3(0.0f, 1.0f, 0.0f));
-    // rotate around z-axis (roll) using third pose z value
+
+    // rotate around z-axis (roll) using pose z value
     localMatrix = glm::rotate(localMatrix, pose[2].GetValue(), glm::vec3(0.0f, 0.0f, 1.0f));
+    // rotate around y-axis (yaw) using pose y value
+    localMatrix = glm::rotate(localMatrix, pose[1].GetValue(), glm::vec3(0.0f, 1.0f, 0.0f));
+    // rotate around x-axis (pitch) using pose x value
+    localMatrix = glm::rotate(localMatrix, pose[0].GetValue(), glm::vec3(1.0f, 0.0f, 0.0f));
 
     // compute world matrix W
     worldMatrix = parentWorld * localMatrix;
@@ -120,7 +127,7 @@ void Joint::Draw(const glm::mat4& viewProjMtx, GLuint shader) {
     printf("Joint::Draw - drawing joint\n");
     // draw orientated box with OpenGL
     // create cube for this joint
-    Cube cube(boxMin, boxMax);
+    Cube cube = Cube(boxMin, boxMax);
 
     // set cube's model matrix to world matrix
     cube.update(worldMatrix);
@@ -131,5 +138,20 @@ void Joint::Draw(const glm::mat4& viewProjMtx, GLuint shader) {
     // recursively call draw() on children
     for (Joint* child : children) {
         child->Draw(viewProjMtx, shader);
+    }
+}
+
+std::string Joint::GetName() {
+    return name;
+}
+
+DOF& Joint::GetDOF(int index) {
+    return pose[index];
+}
+
+void Joint::PopulateJointList(std::vector<Joint*>& jointList) {
+    jointList.push_back(this);
+    for (Joint* child : children) {
+        child->PopulateJointList(jointList);
     }
 }

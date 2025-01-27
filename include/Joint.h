@@ -25,6 +25,9 @@ private:
     std::vector<Joint*> children;
     Joint* parent;
 
+    // name
+    std::string name;
+
 public:
     // constructors/destructors
     Joint();
@@ -35,4 +38,9 @@ public:
     void Update(glm::mat4& parentWorld);  // recursively generate local matrix & concatenate    void load();
     void AddChild(Joint* child);
     void Draw(const glm::mat4& viewProjMtx, GLuint shader);
+
+    // added when implementing gui (imgui)
+    std::string GetName();
+    DOF& GetDOF(int index);
+    void PopulateJointList(std::vector<Joint*>& jointList);
 };

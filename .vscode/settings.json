@@ -1,0 +1,6 @@
+{
+    "cmake.sourceDirectory": "/Users/kurisu/Documents/GitHub/cse169/include/glm",
+    "files.associations": {
+        "vector": "cpp"
+    }
+}

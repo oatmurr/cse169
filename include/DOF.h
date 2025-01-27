@@ -20,4 +20,6 @@ public:
     GLfloat GetValue();
     void SetValue(GLfloat value); // (could) clamp to joint limits
     void SetMinMax(GLfloat min, GLfloat max);
+    float GetMin();
+    float GetMax();
 };
