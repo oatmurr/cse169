@@ -14,7 +14,9 @@ bool Skeleton::Load(const char* filename) {
     printf("Skeleton::Load - loading skeleton from file: %s\n", filename);
     
     if (!filename) {
-        filename = "test.skel";
+        // test.skel used for project 1
+        // filename = "test.skel";
+        return true;
     }
     
     // open .skel file

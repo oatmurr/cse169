@@ -23,7 +23,7 @@ Joint::~Joint() {
 bool Joint::Load(Tokenizer& token) {
     printf("Joint::Load - loading joint data\n");
     
-    // get joint name
+    // get joint name for imgui
     char nameBuffer[256];
     token.GetToken(nameBuffer);
     name = std::string(nameBuffer);

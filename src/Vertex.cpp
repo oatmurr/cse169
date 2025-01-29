@@ -12,14 +12,14 @@ Vertex::Vertex() {
     this->bitangent = glm::vec3(0.0f, 0.0f, 0.0f);
 
     this->numAttachments = 0;
-    
+
     for (int i = 0; i < 4; i++) {
         this->jointIndices[i] = 0;
         this->weights[i] = 0;
     }
 }   
 
-Vertex::Vertex(glm::vec3 position, glm::vec3 normal, int numAttachments, const std::vector<uint8_t>& jointIndices, const std::vector<uint8_t>& weights) {
+Vertex::Vertex(glm::vec3 position, glm::vec3 normal, int numAttachments, const std::vector<int>& jointIndices, const std::vector<float>& weights) {
     this->position = position;
     this->normal = normal;
 
@@ -46,7 +46,8 @@ Vertex::Vertex(glm::vec3 position, glm::vec3 normal, int numAttachments, const s
     this->numAttachments = numAttachments;
 
     for (int i = 0; i < numAttachments; i++) {
-        this->jointIndices[i] = jointIndices[i];
+        // cast as uint8_t
+        this->jointIndices[i] = uint8_t(jointIndices[i]);
         // convert float weight value (0.0-1.0) to byte weight value (0-255)
         this->weights[i] = uint8_t(weights[i] * 255.0f);
     }

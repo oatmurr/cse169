@@ -43,7 +43,7 @@ private:
 public:
     // constructors
     Vertex();
-    Vertex(glm::vec3 position, glm::vec3 normal, int numAttachments, const std::vector<uint8_t>& jointIndices, const std::vector<uint8_t>& weights);
+    Vertex(glm::vec3 position, glm::vec3 normal, int numAttachments, const std::vector<int>& jointIndices, const std::vector<float>& weights);
 
     // functions
     
