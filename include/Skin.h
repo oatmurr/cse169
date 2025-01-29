@@ -3,9 +3,12 @@ class Skin {
 private:
 
 public:
-    
-    
-    void Skin::Update();
+    // constructors/destructors
+    Skin();
+    ~Skin();
 
-    void Skin::Draw();
+    // functions
+    bool Load(const char* filename);
+    void Update();
+    void Draw();
 };

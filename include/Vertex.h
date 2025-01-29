@@ -1,4 +1,5 @@
 #include "core.h"
+#include <vector>
 
 class Vertex {
 private:    
@@ -25,30 +26,24 @@ private:
     // note: normal, tangent, bitangent are orthogonal to each other
     // https://i.sstatic.net/tAQNN.png
 
-    // Skinning data
+    // Skinning data: jointIndices[4] + weights[4] = 8 bytes
     
     // number of attachments (max 4)
     int numAttachments;
 
     // joint indices (max 4), one byte each, limited to 256 joints
-    unsigned char jointIndices[4];
+    uint8_t jointIndices[4];
 
     // weights (max 4), one byte each, precision of 1/256 = ~0.004%
-    unsigned char weights[4];
-    
-    // with skinningData[7]; fourth weight is stored as 1.0 - (weight[0] - weight[1] - weight[2])
-    // unsigned char weights[3];
+    uint8_t weights[4];
+    // fourth weight is stored as 1.0 - (weight[0] - weight[1] - weight[2])
+    // uint8_t weights[3];
 
-    // jointIndices[4] + weights[4] = 8 bytes
-    unsigned char skinningData[8];
-
-    // with weights[3]
-    // unsigned char skinningData[7];
     
 public:
-    // constructors/destructors
+    // constructors
     Vertex();
-    ~Vertex();
+    Vertex(glm::vec3 position, glm::vec3 normal, int numAttachments, const std::vector<uint8_t>& jointIndices, const std::vector<uint8_t>& weights);
 
     // functions
     

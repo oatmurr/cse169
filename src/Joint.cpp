@@ -155,3 +155,7 @@ void Joint::PopulateJointList(std::vector<Joint*>& jointList) {
         child->PopulateJointList(jointList);
     }
 }
+
+glm::mat4 Joint::GetWorldMatrix() {
+    return worldMatrix;
+}

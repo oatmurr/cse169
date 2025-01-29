@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
     if (!Window::initializeObjects()) exit(EXIT_FAILURE);
 
     Window::skeleton->Load(argv[1]);
-    Window::skeleton->PopulateJointList(Window::jointList);
+    Window::skeleton->PopulateJointList();
 
     // Loop while GLFW window should stay open.
     while (!glfwWindowShouldClose(window)) {

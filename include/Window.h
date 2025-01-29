@@ -45,7 +45,6 @@ public:
     static void mouse_callback(GLFWwindow* window, int button, int action, int mods);
     static void cursor_callback(GLFWwindow* window, double currX, double currY);
 
-    // jointList for imgui
-    static std::vector<Joint*> jointList;
+    // imgui stuff
     static void RenderJointControls();
 };

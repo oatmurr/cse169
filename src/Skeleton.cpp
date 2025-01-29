@@ -57,9 +57,17 @@ void Skeleton::Draw(const glm::mat4& viewProjMtx, GLuint shader) {
     printf("Skeleton::Draw - finished drawing skeleton\n");
 }
 
-void Skeleton::PopulateJointList(std::vector<Joint*>& jointList) {
+void Skeleton::PopulateJointList() {
     printf("Skeleton::PopulateJointList - populating joint list\n");
     if (root) {
         root->PopulateJointList(jointList);
     }
+}
+
+glm::mat4 Skeleton::GetWorldMatrix(int jointIndex) {
+    return jointList[jointIndex]->GetWorldMatrix();
+}
+
+std::vector<Joint*> Skeleton::GetJointList() {
+    return jointList;
 }

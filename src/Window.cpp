@@ -22,7 +22,6 @@ GLuint Window::shaderProgram;
 // imgui stuff
 static Joint* selectedJoint = nullptr;
 static int currentJointIndex = 0;
-std::vector<Joint*> Window::jointList;
 
 // Constructors and desctructors
 // bool Window::initializeProgram() {
@@ -243,13 +242,13 @@ void Window::RenderJointControls() {
 
     ImGui::SameLine();
 
-    if (ImGui::Button("next joint") && currentJointIndex < jointList.size() - 1) {
+    if (ImGui::Button("next joint") && currentJointIndex < skeleton->GetJointList().size() - 1) {
         currentJointIndex++;
     }
     
-    if (!jointList.empty()) {
+    if (!skeleton->GetJointList().empty()) {
         // get the selected joint
-        selectedJoint = jointList[currentJointIndex];
+        selectedJoint = skeleton->GetJointList()[currentJointIndex];
         ImGui::Text("selected joint: %s", selectedJoint->GetName().c_str());
 
         // x-rotation

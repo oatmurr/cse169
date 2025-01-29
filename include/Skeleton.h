@@ -7,6 +7,9 @@ private:
     // joint tree
     Joint* root;
 
+    // joint list for imgui
+    std::vector<Joint*> jointList;
+
 public:
     // constructors/destructors
     Skeleton();
@@ -19,5 +22,9 @@ public:
 
     // added when implementing gui (imgui)
     // populate joint list for imgui
-    void PopulateJointList(std::vector<Joint*>& jointList);
+    void PopulateJointList();
+
+    // added for skinning
+    glm::mat4 GetWorldMatrix(int jointIndex);
+    std::vector<Joint*> GetJointList();
 };

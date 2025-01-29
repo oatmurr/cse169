@@ -43,4 +43,7 @@ public:
     std::string GetName();
     DOF& GetDOF(int index);
     void PopulateJointList(std::vector<Joint*>& jointList);
+
+    // added for skinning
+    glm::mat4 GetWorldMatrix();
 };
