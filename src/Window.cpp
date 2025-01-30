@@ -10,6 +10,14 @@ const char* Window::windowTitle = "Model Environment";
 Skeleton* Window::skeleton;
 Skin* Window::skin;
 
+bool Window::drawSkeleton = true;
+
+// project 2 lighting stuff
+glm::vec3 Window::lightDirection1;
+glm::vec3 Window::lightColor1;
+glm::vec3 Window::lightDirection2;
+glm::vec3 Window::lightColor2;
+
 // Camera Properties
 Camera* Cam;
 
@@ -29,6 +37,12 @@ static int currentJointIndex = 0;
 bool Window::initializeProgram(GLFWwindow* window) {
     // Create a shader program with a vertex shader and a fragment shader.
     shaderProgram = LoadShaders("shaders/shader.vert", "shaders/shader.frag");
+
+    // project 2 lighting stuff
+    lightDirection1 = glm::normalize(glm::vec3(1, 5, 2));
+    lightColor1 = glm::vec3(1.0f, 0.0f, 0.0f); // red light
+    lightDirection2 = glm::normalize(glm::vec3(-2, -3, 1));
+    lightColor2 = glm::vec3(0.0f, 0.0f, 1.0f); // blue light
 
     // set up imgui
     IMGUI_CHECKVERSION();
@@ -155,12 +169,10 @@ void Window::displayCallback(GLFWwindow* window) {
 
     // Render the object.
     // cube->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
-    skeleton->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
-    skin->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
-    GLenum err = glGetError();
-        if (err != GL_NO_ERROR) {
-    printf("OpenGL error after skin draw: %d\n", err);
+    if (drawSkeleton) {
+        skeleton->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
     }
+    skin->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram, lightDirection1, lightColor1, lightDirection2, lightColor2);
 
     // create imgui window
     ImGui::Begin("joints");
@@ -245,6 +257,8 @@ void Window::cursor_callback(GLFWwindow* window, double currX, double currY) {
 
 void Window::RenderJointControls() {
     
+    ImGui::Checkbox("draw skeleton", &drawSkeleton);
+
     if (ImGui::Button("previous joint") && currentJointIndex > 0) {
         currentJointIndex--;
     }

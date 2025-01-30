@@ -49,4 +49,11 @@ public:
 
     // imgui stuff
     static void RenderJointControls();
+    static bool drawSkeleton;
+
+    // project 2 lighting stuff
+    static glm::vec3 lightDirection1;
+    static glm::vec3 lightColor1;
+    static glm::vec3 lightDirection2;
+    static glm::vec3 lightColor2;
 };

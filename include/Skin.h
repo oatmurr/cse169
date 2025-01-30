@@ -37,7 +37,7 @@ public:
     // optional skeleton parameter
     bool Load(const char* filename, Skeleton* skeleton = nullptr);
     void Update();
-    void Draw(const glm::mat4& viewProjMtx, GLuint shader);
+    void Draw(const glm::mat4& viewProjMtx, GLuint shader, const glm::vec3& lightDirection1, const glm::vec3& lightColor1, const glm::vec3& lightDirection2, const glm::vec3& lightColor2);
     // can't do in constructor because skin file is not loaded yet
     void SetupBuffers();
 };

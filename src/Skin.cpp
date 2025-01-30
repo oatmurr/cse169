@@ -214,12 +214,9 @@ void Skin::Update() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Skin::Draw(const glm::mat4& viewProjMtx, GLuint shader) {
+void Skin::Draw(const glm::mat4& viewProjMtx, GLuint shader, const glm::vec3& lightDirection1, const glm::vec3& lightColor1, const glm::vec3& lightDirection2, const glm::vec3& lightColor2) {
     // draw triangles using transformed positions and normals
     // printf("Skin::Draw - %zu vertices, %zu triangles\n", transformedPositions.size(), triangleIndices.size());
-
-    // color = glm::vec3(0.8f, 0.8f, 0.8f);
-    // model = glm::mat4(1.0f);
 
     // activate the shader program
     glUseProgram(shader);
@@ -229,6 +226,12 @@ void Skin::Draw(const glm::mat4& viewProjMtx, GLuint shader) {
     glUniformMatrix4fv(glGetUniformLocation(shader, "viewProj"), 1, false, (float*)&viewProjMtx);
     glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, (float*)&model);
     glUniform3fv(glGetUniformLocation(shader, "DiffuseColor"), 1, &color[0]);
+
+    // project 2 lighting stuff
+    glUniform3fv(glGetUniformLocation(shader, "LightDirection1"), 1, &lightDirection1[0]);
+    glUniform3fv(glGetUniformLocation(shader, "LightDirection2"), 1, &lightDirection2[0]);
+    glUniform3fv(glGetUniformLocation(shader, "LightColor1"), 1, &lightColor1[0]);
+    glUniform3fv(glGetUniformLocation(shader, "LightColor2"), 1, &lightColor2[0]);
 
     // bind the VAO
     glBindVertexArray(VAO);
