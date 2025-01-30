@@ -38,7 +38,7 @@ bool Skeleton::Load(const char* filename) {
 }
 
 void Skeleton::Update() {
-    printf("Skeleton::Update - updating skeleton\n");
+    // printf("Skeleton::Update - updating skeleton\n");
     // traverse tree and update all joint matrices
     glm::mat4 identity = glm::mat4(1.0f);
     if (root == nullptr) {
@@ -46,17 +46,17 @@ void Skeleton::Update() {
         return;
     }
     root->Update(identity);
-    printf("Skeleton::Update - finished updating skeleton\n");
+    // printf("Skeleton::Update - finished updating skeleton\n");
 }
 
 void Skeleton::Draw(const glm::mat4& viewProjMtx, GLuint shader) {
-    printf("Skeleton::Draw - drawing skeleton\n");
+    // printf("Skeleton::Draw - drawing skeleton\n");
     if (root == nullptr) {
         printf("Skeleton::Draw - ERROR: root is null in Draw()\n");
         return;
     }
     root->Draw(viewProjMtx, shader);
-    printf("Skeleton::Draw - finished drawing skeleton\n");
+    // printf("Skeleton::Draw - finished drawing skeleton\n");
 }
 
 void Skeleton::PopulateJointList() {

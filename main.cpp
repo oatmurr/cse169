@@ -62,8 +62,22 @@ int main(int argc, char* argv[]) {
     // Initialize objects/pointers for rendering; exit if initialization fails.
     if (!Window::initializeObjects()) exit(EXIT_FAILURE);
 
-    Window::skeleton->Load(argv[1]);
-    Window::skeleton->PopulateJointList();
+    // command line stuff
+    if (argc > 1) {
+        std::string filename = argv[1];
+        // if there is a .skel file
+        if (filename.find(".skel") != std::string::npos) {
+            Window::skeleton->Load(argv[1]);
+            Window::skeleton->PopulateJointList();
+            // if there is a .skel file and a .skin file
+            if (argc > 2) {
+                Window::skin->Load(argv[2], Window::skeleton);
+            }
+        // if there is a .skin file but no .skel file
+        } else if (filename.find(".skin") != std::string::npos) {
+        Window::skin->Load(argv[1], nullptr);
+        } 
+    }
 
     // Loop while GLFW window should stay open.
     while (!glfwWindowShouldClose(window)) {

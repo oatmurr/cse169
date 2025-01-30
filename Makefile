@@ -16,10 +16,10 @@ $(OBJDIR):
 
 .DEFAULT_GOAL := all
 all: menv
-menv: $(OBJDIR)/main.o $(OBJDIR)/Camera.o $(OBJDIR)/Cube.o $(OBJDIR)/Shader.o $(OBJDIR)/Tokenizer.o $(OBJDIR)/Window.o $(OBJDIR)/DOF.o $(OBJDIR)/Joint.o $(OBJDIR)/Skeleton.o $(OBJDIR)/imgui.o $(OBJDIR)/imgui_demo.o $(OBJDIR)/imgui_draw.o $(OBJDIR)/imgui_tables.o $(OBJDIR)/imgui_widgets.o $(OBJDIR)/imgui_impl_glfw.o $(OBJDIR)/imgui_impl_opengl3.o
+menv: $(OBJDIR)/main.o $(OBJDIR)/Camera.o $(OBJDIR)/Cube.o $(OBJDIR)/Shader.o $(OBJDIR)/Tokenizer.o $(OBJDIR)/Window.o $(OBJDIR)/DOF.o $(OBJDIR)/Joint.o $(OBJDIR)/Skeleton.o $(OBJDIR)/imgui.o $(OBJDIR)/imgui_demo.o $(OBJDIR)/imgui_draw.o $(OBJDIR)/imgui_tables.o $(OBJDIR)/imgui_widgets.o $(OBJDIR)/imgui_impl_glfw.o $(OBJDIR)/imgui_impl_opengl3.o $(OBJDIR)/Vertex.o $(OBJDIR)/Triangle.o $(OBJDIR)/Skin.o
 	$(CC) -o menv $(OBJDIR)/*.o $(LDFLAGS)
 
-# project 1
+# project 1 - skeleton
 $(OBJDIR)/main.o: main.cpp include/Window.h | $(OBJDIR)
 	$(CC) $(CFLAGS) $(INCFLAGS) -c main.cpp -o $(OBJDIR)/main.o
 
@@ -68,6 +68,16 @@ $(OBJDIR)/imgui_impl_glfw.o: include/backends/imgui_impl_glfw.cpp include/backen
 
 $(OBJDIR)/imgui_impl_opengl3.o: include/backends/imgui_impl_opengl3.cpp include/backends/imgui_impl_opengl3.h | $(OBJDIR)
 	$(CC) $(CFLAGS) $(INCFLAGS) -c include/backends/imgui_impl_opengl3.cpp -o $(OBJDIR)/imgui_impl_opengl3.o
+
+# project 2 - skin
+$(OBJDIR)/Vertex.o: src/Vertex.cpp include/Vertex.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Vertex.cpp -o $(OBJDIR)/Vertex.o
+
+$(OBJDIR)/Triangle.o: src/Triangle.cpp include/Triangle.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Triangle.cpp -o $(OBJDIR)/Triangle.o
+
+$(OBJDIR)/Skin.o: src/Skin.cpp include/Skin.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Skin.cpp -o $(OBJDIR)/Skin.o
 
 clean:
 	$(RM) $(OBJDIR)/*.o menv

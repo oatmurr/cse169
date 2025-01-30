@@ -18,6 +18,16 @@ private:
     // skinning data
     Skeleton* skeleton;
     std::vector<glm::mat4> skinningMatrices;
+
+    // rendering stuff - based off Cube.h
+    GLuint VAO;
+    GLuint VBO_positions, VBO_normals, EBO;
+
+    glm::mat4 model;
+    glm::vec3 color;
+    // glDrawElements expects GL_UNSIGNED_INT
+    std::vector<unsigned int> triangleIndices;
+
 public:
     // constructors/destructors
     Skin();
@@ -27,5 +37,7 @@ public:
     // optional skeleton parameter
     bool Load(const char* filename, Skeleton* skeleton = nullptr);
     void Update();
-    void Draw();
+    void Draw(const glm::mat4& viewProjMtx, GLuint shader);
+    // can't do in constructor because skin file is not loaded yet
+    void SetupBuffers();
 };

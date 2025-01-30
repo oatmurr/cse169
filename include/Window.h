@@ -3,6 +3,7 @@
 #include "Camera.h"
 #include "Shader.h"
 #include "Skeleton.h"
+#include "Skin.h"
 
 // imgui stuff
 #include "imgui/imgui.h"
@@ -19,6 +20,7 @@ public:
     // Objects to render
     // static Cube* cube;
     static Skeleton* skeleton;
+    static Skin* skin;
 
     // Shader Program
     static GLuint shaderProgram;

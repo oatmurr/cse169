@@ -97,7 +97,7 @@ bool Joint::Load(Tokenizer& token) {
 }
 
 void Joint::Update(glm::mat4& parentWorld) {
-    printf("Joint::Update - updating joint\n");
+    // printf("Joint::Update - updating joint\n");
     // compute local matrix L
     // initialize local matrix with identity matrix and translate by offset vector
     localMatrix = glm::translate(glm::mat4(1.0f), offset);
@@ -124,7 +124,7 @@ void Joint::AddChild(Joint* child) {
 }
 
 void Joint::Draw(const glm::mat4& viewProjMtx, GLuint shader) {
-    printf("Joint::Draw - drawing joint\n");
+    // printf("Joint::Draw - drawing joint\n");
     // draw orientated box with OpenGL
     // create cube for this joint
     Cube cube = Cube(boxMin, boxMax);

@@ -8,6 +8,7 @@ const char* Window::windowTitle = "Model Environment";
 // Objects to render
 // Cube* Window::cube;
 Skeleton* Window::skeleton;
+Skin* Window::skin;
 
 // Camera Properties
 Camera* Cam;
@@ -50,6 +51,7 @@ bool Window::initializeObjects() {
     // cube = new Cube();
     // cube = new Cube(glm::vec3(-1, 0, -2), glm::vec3(1, 1, 1));
     skeleton = new Skeleton();
+    skin = new Skin();
     return true;
 }
 
@@ -57,6 +59,7 @@ void Window::cleanUp() {
     // Deallcoate the objects.
     // delete cube;
     delete skeleton;
+    delete skin;
 
     // Delete the shader program.
     glDeleteProgram(shaderProgram);
@@ -137,6 +140,7 @@ void Window::idleCallback() {
 
     // cube->update();
     skeleton->Update();
+    skin->Update();
 }
 
 void Window::displayCallback(GLFWwindow* window) {
@@ -152,6 +156,11 @@ void Window::displayCallback(GLFWwindow* window) {
     // Render the object.
     // cube->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
     skeleton->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+    skin->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+    GLenum err = glGetError();
+        if (err != GL_NO_ERROR) {
+    printf("OpenGL error after skin draw: %d\n", err);
+    }
 
     // create imgui window
     ImGui::Begin("joints");
