@@ -143,9 +143,47 @@ bool Skin::Load(const char* filename, Skeleton* skeleton = nullptr) {
 }
 
 void Skin::Update() {
+    // if no skeleton, mesh stays in binding pose
+    if (!skeleton) {
+        return;
+    }
 
+    // compute skinning matrix for each joint Mi = Wi * Bi^(-1)
+    // Mi = skinning matrix of joint i
+    // Wi = world matrix of joint i
+    // Bi = binding matrix for joint i
+    for (int i = 0; i < bindings.size(); i++) {
+        skinningMatrices[i] = skeleton->GetWorldMatrix(i) * glm::inverse(bindings[i]);
+    }
+
+    // compute blended world space positions and normals
+    // transform each vertex position and normal
+    for (int i = 0; i < positions.size(); i++) {
+        glm::vec4 position = glm::vec4(positions[i], 1.0f);
+        // use 0 as the 4th coordinate
+        glm::vec4 normal = glm::vec4(normals[i], 0.0f);
+
+        glm::vec4 blendedPosition = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+        glm::vec4 blendedNormal = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
+
+        // apply weighted transformation from each attached joint
+        for (int j = 0; j < vertices[i].GetNumAttachments(); j++) {
+            // conversion from byte to float handled in Vertex::GetWeight()
+            float weight = vertices[i].GetWeight(j);
+            int jointIndex = vertices[i].GetJointIndex(j);
+
+            // v' = Σ wi * Wi * Bi^(-1) * v
+            blendedPosition += weight * (skinningMatrices[jointIndex] * position);
+            // n' = normalise(Σ wi * Wi * Bi^(-1) * n) (normalisation done during storage)
+            blendedNormal += weight * (skinningMatrices[jointIndex] * normal);
+        }
+
+        // storage
+        transformedPositions[i] = glm::vec3(blendedPosition);
+        transformedNormals[i] = glm::normalize(glm::vec3(blendedNormal));
+    }
 }
 
 void Skin::Draw() {
-
+    // draw triangles using transformed positions and normals
 }

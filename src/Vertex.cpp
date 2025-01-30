@@ -52,3 +52,15 @@ Vertex::Vertex(glm::vec3 position, glm::vec3 normal, int numAttachments, const s
         this->weights[i] = uint8_t(weights[i] * 255.0f);
     }
 }
+
+int Vertex::GetNumAttachments() {
+    return this->numAttachments;
+}
+
+float Vertex::GetWeight(int index) {
+    return this->weights[index] / 255.0f;
+}
+
+int Vertex::GetJointIndex(int index) {
+    return this->jointIndices[index];
+}

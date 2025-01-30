@@ -46,5 +46,7 @@ public:
     Vertex(glm::vec3 position, glm::vec3 normal, int numAttachments, const std::vector<int>& jointIndices, const std::vector<float>& weights);
 
     // functions
-    
+    int GetNumAttachments();
+    float GetWeight(int index);
+    int GetJointIndex(int index);
 };
