@@ -157,7 +157,7 @@ bool Skin::Load(const char* filename, Skeleton* skeleton) {
 void Skin::Update() {
     // if no skeleton, mesh stays in binding pose
     if (!skeleton) {
-        printf("Skin::Update - no skeleton, staying in binding pose\n");
+        // printf("Skin::Update - no skeleton, staying in binding pose\n");
         return;
     }
     // compute skinning matrix for each joint Mi = Wi * Bi^(-1)

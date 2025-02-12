@@ -37,55 +37,55 @@ bool Joint::Load(Tokenizer& token) {
         token.GetToken(temp);
         printf("Joint::Load - processing token: %s\n", temp);
         // check for 'offset' token
-        if(strcmp(temp, "offset") == 0) {
+        if (strcmp(temp, "offset") == 0) {
             offset.x = token.GetFloat();
             offset.y = token.GetFloat();
             offset.z = token.GetFloat();
             printf("Joint::Load - offset: %f, %f, %f\n", offset.x, offset.y, offset.z);
         // check for 'boxmin'' token
-        } else if(strcmp(temp, "boxmin") == 0) {
+        } else if (strcmp(temp, "boxmin") == 0) {
             boxMin.x = token.GetFloat();
             boxMin.y = token.GetFloat();
             boxMin.z = token.GetFloat();
             printf("Joint::Load - boxMin: %f, %f, %f\n", boxMin.x, boxMin.y, boxMin.z);
         // check for 'boxmax' token
-        } else if(strcmp(temp, "boxmax") == 0) {
+        } else if (strcmp(temp, "boxmax") == 0) {
             boxMax.x = token.GetFloat();
             boxMax.y = token.GetFloat();
             boxMax.z = token.GetFloat();
             printf("Joint::Load - boxMax: %f, %f, %f\n", boxMax.x, boxMax.y, boxMax.z);
         // check for 'rotxlimit' token
-        } else if(strcmp(temp, "rotxlimit") == 0) {
+        } else if (strcmp(temp, "rotxlimit") == 0) {
             float min = token.GetFloat();
             float max = token.GetFloat();
             pose[0].SetMinMax(min, max);
             printf("Joint::Load - rotxlimit: %f, %f\n", min, max);
         // check for 'rotylimit' token
-        } else if(strcmp(temp, "rotylimit") == 0) {
+        } else if (strcmp(temp, "rotylimit") == 0) {
             float min = token.GetFloat();
             float max = token.GetFloat();
             pose[1].SetMinMax(min, max);
             printf("Joint::Load - rotylimit: %f, %f\n", min, max);
         // check for 'rotzlimit' token
-        } else if(strcmp(temp, "rotzlimit") == 0) {
+        } else if (strcmp(temp, "rotzlimit") == 0) {
             float min = token.GetFloat();
             float max = token.GetFloat();
             pose[2].SetMinMax(min, max);
             printf("Joint::Load - rotzlimit: %f, %f\n", min, max);
         // check for 'pose' token
-        } else if(strcmp(temp, "pose") == 0) {
+        } else if (strcmp(temp, "pose") == 0) {
             pose[0].SetValue(token.GetFloat());
             pose[1].SetValue(token.GetFloat());
             pose[2].SetValue(token.GetFloat());
             printf("Joint::Load - pose: %f, %f, %f\n", pose[0].GetValue(), pose[1].GetValue(), pose[2].GetValue());
         // check for child 'balljoint; token
-        } else if(strcmp(temp, "balljoint") == 0) {
+        } else if (strcmp(temp, "balljoint") == 0) {
             printf("Joint::Load - creating child joint\n");
             Joint *child = new Joint();
             child->Load(token);
             AddChild(child);
         // check for '}' token
-        } else if(strcmp(temp, "}") == 0) {
+        } else if (strcmp(temp, "}") == 0) {
             printf("Joint::Load - finished loading joint\n");
             return true;
         // unrecognised token

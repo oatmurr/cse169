@@ -32,7 +32,8 @@ private:
     int numAttachments;
 
     // joint indices (max 4), one byte each, limited to 256 joints
-    uint8_t jointIndices[4];
+    // uint8_t jointIndices[4];
+    uint16_t jointIndices[4];
 
     // weights (max 4), one byte each, precision of 1/256 = ~0.004%
     uint8_t weights[4];

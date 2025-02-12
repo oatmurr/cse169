@@ -47,7 +47,8 @@ Vertex::Vertex(glm::vec3 position, glm::vec3 normal, int numAttachments, const s
 
     for (int i = 0; i < numAttachments; i++) {
         // cast as uint8_t
-        this->jointIndices[i] = uint8_t(jointIndices[i]);
+        // this->jointIndices[i] = uint8_t(jointIndices[i]);
+        this->jointIndices[i] = uint16_t(jointIndices[i]);
         // convert float weight value (0.0-1.0) to byte weight value (0-255)
         this->weights[i] = uint8_t(weights[i] * 255.0f);
     }

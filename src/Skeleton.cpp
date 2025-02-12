@@ -42,7 +42,7 @@ void Skeleton::Update() {
     // traverse tree and update all joint matrices
     glm::mat4 identity = glm::mat4(1.0f);
     if (root == nullptr) {
-        printf("Skeleton::Update - ERROR: root is null in Update()\n");
+        // printf("Skeleton::Update - ERROR: root is null in Update()\n");
         return;
     }
     root->Update(identity);
@@ -52,7 +52,7 @@ void Skeleton::Update() {
 void Skeleton::Draw(const glm::mat4& viewProjMtx, GLuint shader) {
     // printf("Skeleton::Draw - drawing skeleton\n");
     if (root == nullptr) {
-        printf("Skeleton::Draw - ERROR: root is null in Draw()\n");
+        // printf("Skeleton::Draw - ERROR: root is null in Draw()\n");
         return;
     }
     root->Draw(viewProjMtx, shader);
