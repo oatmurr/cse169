@@ -1,18 +1,17 @@
-#include "Skeleton.h"
+#pragma once
+
 #include "Skin.h"
 #include "Pose.h"
 
-// simple container for a skeleton, skin, and morphs
 class Rig {
 
 private:
-    Skeleton skeleton;
-    Skin skin;
-    // std::vector<Morph> morphs; ???
+    Skeleton* skeleton;
+    Skin* skin;
 
 public:
-    Rig();
+    Rig(char* skelFilename, char* skinFilename = nullptr);
     ~Rig();
 
-    void ApplyPose(const Pose& pose);
+    void ApplyPose(Pose& pose);
 };

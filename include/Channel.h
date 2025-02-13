@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Keyframe.h"
 #include <vector>
 

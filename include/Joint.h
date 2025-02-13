@@ -35,7 +35,7 @@ public:
 
     // functions
     bool Load(Tokenizer& token);
-    void Update(glm::mat4& parentWorld);  // recursively generate local matrix & concatenate    void load();
+    void Update(glm::mat4& parentWorld);  // recursively generate local matrix & concatenate
     void AddChild(Joint* child);
     void Draw(const glm::mat4& viewProjMtx, GLuint shader);
 
@@ -46,4 +46,7 @@ public:
 
     // added for skinning
     glm::mat4 GetWorldMatrix();
+
+    // added for animation
+    void SetPose(float x, float y, float z);
 };

@@ -159,3 +159,9 @@ void Joint::PopulateJointList(std::vector<Joint*>& jointList) {
 glm::mat4 Joint::GetWorldMatrix() {
     return worldMatrix;
 }
+
+void Joint::SetPose(float x, float y, float z) {
+    pose[0].SetValue(x);
+    pose[1].SetValue(y);
+    pose[2].SetValue(z);
+}

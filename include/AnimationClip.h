@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Channel.h"
 #include "Pose.h"
 
