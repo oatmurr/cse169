@@ -14,5 +14,7 @@ public:
     Rig(Skeleton* skeleton, Skin* skin = nullptr);
     ~Rig();
 
+    Skeleton* GetSkeleton();
+
     void ApplyPose(Pose& pose);
 };

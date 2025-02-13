@@ -44,7 +44,11 @@ float Channel::Evaluate(float time) {
     float t2 = t * t;
     float t3 = t2 * t;
 
-    return keys[span].a * t3 + keys[span].b * t2 + keys[span].c * t + keys[span].d;
+    float result = keys[span].a * t3 + keys[span].b * t2 + keys[span].c * t + keys[span].d;
+
+    // printf("Channel::Evaluate - Channel evaluated value: %f at time %f\n", result, time);
+
+    return result;
 }
 
 bool Channel::Load(Tokenizer& token) {
@@ -55,19 +59,29 @@ bool Channel::Load(Tokenizer& token) {
         char temp[256];
         token.GetToken(temp);
 
-        if (strcmp(temp, "extrapolation") == 0) {
+        if (strcmp(temp, "extrapolate") == 0) {
+            
             token.GetToken(temp);
             extrapolationIn = std::string(temp);
             token.GetToken(temp);
             extrapolationOut = std::string(temp);
         } else if (strcmp(temp, "keys") == 0) {
+            
             int numKeys = token.GetInt();
+            printf("Channel::Load - reading %d keyframes\n", numKeys);
+
+            if (numKeys == 0) {
+                printf("Channel::Load - numKeys is zero\n");
+                return false;
+            }
+
             keys.resize(numKeys);
             token.FindToken("{");
 
             for (int i = 0; i < numKeys; i++) {
                 keys[i].Load(token);
             }
+
             token.FindToken("}");
             break;
 
@@ -84,6 +98,72 @@ bool Channel::Load(Tokenizer& token) {
 
 void Channel::Precompute() {
     
+    if (keys.size() < 2) {
+        printf("Channel::Precompute - not enough keys (size: %zu)\n", keys.size());
+        return;
+    }
+
+    for (int i = 0; i < keys.size(); i++) {
+        // current key
+        float t = keys[i].GetTime();
+        float p = keys[i].GetValue();
+
+        // previous key
+        float tPrev = t;
+        float pPrev = p;
+        if (i > 0) {
+            tPrev = keys[i - 1].GetTime();
+            pPrev = keys[i - 1].GetValue();
+        }
+
+        // next key
+        float tNext = t;
+        float pNext = p;
+        if (i < keys.size() - 1) {
+            tNext = keys[i + 1].GetTime();
+            pNext = keys[i + 1].GetValue();
+        }
+
+        // incoming tangent
+        std::string ruleIn = keys[i].GetRuleIn();
+        // "fixed" keeps existing tangent value
+        if (ruleIn == "flat") {
+            keys[i].SetTangentIn(0.0f);
+        } else if (ruleIn == "linear") {
+            keys[i].SetTangentIn((p - pPrev) / (t - tPrev));
+        } else if (ruleIn == "smooth") {
+            if (i == 0) {
+                // first key - use linear
+                keys[i].SetTangentIn((pNext - p) / (tNext - t));
+            } else {
+                // otherwise use smooth
+                keys[i].SetTangentIn((pNext - pPrev) / (tNext - tPrev));
+            }
+        } else {
+            printf("Channel::Precompute - unrecognised ruleIn: %s\n", ruleIn.c_str());
+        }
+
+        // outgoing tangent
+        std::string ruleOut = keys[i].GetRuleOut();
+        // "fixed" keeps existing tangent value
+        if (ruleOut == "flat") {
+            keys[i].SetTangentOut(0.0f);
+        } else if (ruleOut == "linear") {
+            keys[i].SetTangentOut((pNext - p) / (tNext - t));
+        } else if (ruleOut == "smooth") {
+            if (i == keys.size() - 1) {
+                // last key - use linear
+                keys[i].SetTangentOut((p - pPrev) / (t - tPrev));
+            } else {
+                // otherwise use smooth
+                keys[i].SetTangentOut((pNext - pPrev) / (tNext - tPrev));
+            }
+        } else {
+            printf("Channel::Precompute - unrecognised ruleOut: %s\n", ruleOut.c_str());
+        }
+    }
+
+    // compute coefficients for each key using calculated tangents
     for (int i = 0; i < keys.size() - 1; i++) {
         keys[i].ComputeCoefficients(keys[i + 1]);
     }
@@ -91,6 +171,11 @@ void Channel::Precompute() {
 
 int Channel::FindSpan(float time) {
     
+    if (keys.size() < 2) {
+        printf("Channel::FindSpan - not enough keys\n");
+        return 0;
+    }
+
     int left = 0;
     int right = keys.size() - 1;
 
@@ -125,15 +210,17 @@ int Channel::FindSpan(float time) {
 
 float Channel::ExtrapolateIn(float time) {
     
+    if (keys.size() < 2) {
+        printf("Channel::ExtrapolateIn - not enough keys\n");
+        return 0.0f;
+    }
+
     // get key values and times needed for calculations
     float t0 = keys[0].GetTime();
     float p0 = keys[0].GetValue();
 
     float t1 = keys[1].GetTime();
     float p1 = keys[1].GetValue();
-
-    float t2 = keys[2].GetTime();
-    float p2 = keys[2].GetValue();
 
     float tN = keys[keys.size() - 1].GetTime();
     float pN = keys[keys.size() - 1].GetValue();
@@ -142,7 +229,7 @@ float Channel::ExtrapolateIn(float time) {
     float dt = time - t0;
     
     // calculate incoming tangent (v) based on rule type
-    float v;
+    float v = 0.0f;
 
     std::string ruleIn = keys[0].GetRuleIn();
 
@@ -153,7 +240,15 @@ float Channel::ExtrapolateIn(float time) {
     } else if (ruleIn == "linear") {
         v = (p1 - p0) / (t1 - t0);
     } else if (ruleIn == "smooth") {
-        v = (p2 - p0) / (t2 - t0);
+        
+        if (keys.size() > 2) {
+            float t2 = keys[2].GetTime();
+            float p2 = keys[2].GetValue();
+            v = (p2 - p0) / (t2 - t0);
+        } else {
+            // linear
+            v = (p1 - p0) / (t1 - t0);
+        }
     } else {
         printf("Channel::ExtrapolateIn - unrecognised rule: %s\n", ruleIn.c_str());
     }
@@ -205,6 +300,11 @@ float Channel::ExtrapolateIn(float time) {
 
 float Channel::ExtrapolateOut(float time) {
     
+    if (keys.size() < 2) {
+        printf("Channel::ExtrapolateOut - not enough keys\n");
+        return 0.0f;
+    }
+
     // get key values and times needed for calculations
     float t0 = keys[0].GetTime();
     float p0 = keys[0].GetValue();
@@ -215,14 +315,11 @@ float Channel::ExtrapolateOut(float time) {
     float tN1 = keys[keys.size() - 2].GetTime();
     float pN1 = keys[keys.size() - 2].GetValue();
 
-    float tN2 = keys[keys.size() - 3].GetTime();
-    float pN2 = keys[keys.size() - 3].GetValue();
-    
     // calculate time difference from end
     float dt = time - tN;
 
     // calculate outgoing tangent based on rule type
-    float v;
+    float v = 0.0f;
 
     std::string ruleOut = keys[keys.size() - 1].GetRuleOut();
     
@@ -233,7 +330,15 @@ float Channel::ExtrapolateOut(float time) {
     } else if (ruleOut == "linear") {
         v = (pN1 - pN) / (tN1 - tN);
     } else if (ruleOut == "smooth") {
-        v = (pN2 - pN) / (tN2 - tN);
+        
+        if (keys.size() > 2) {
+            float tN2 = keys[keys.size() - 3].GetTime();
+            float pN2 = keys[keys.size() - 3].GetValue();
+            v = (pN2 - pN) / (tN2 - tN);
+        } else {
+            // linear
+            v = (pN1 - pN) / (tN1 - tN);
+        }
     } else {
         printf("Channel::ExtrapolateOut - unrecognised rule: %s\n", ruleOut.c_str());
     }

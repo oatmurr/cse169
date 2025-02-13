@@ -60,7 +60,6 @@ void Skeleton::Draw(const glm::mat4& viewProjMtx, GLuint shader) {
 }
 
 void Skeleton::PopulateJointList() {
-    printf("Skeleton::PopulateJointList - populating joint list\n");
     if (root) {
         root->PopulateJointList(jointList);
     }

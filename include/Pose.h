@@ -18,4 +18,8 @@ public:
     // getters and setters
     void SetDOF(int index, float DOF);
     DOF& GetDOF(int index);
+    int GetNumDOFs();
+
+    // resize
+    void Resize(int size);
 };

@@ -21,7 +21,10 @@ private:
     // pose (xyz values to pose DOFs)
     // note: different from Pose class (which stores the DOFs of all joints)
     std::vector<DOF> pose{DOF(), DOF(), DOF()};
-    
+
+    // initial pose from .skel file
+    std::vector<DOF> initialPose{DOF(), DOF(), DOF()};
+
     // tree data
     std::vector<Joint*> children;
     Joint* parent;
@@ -49,5 +52,6 @@ public:
     glm::mat4 GetWorldMatrix();
 
     // added for animation
-    void SetPose(float x, float y, float z);
+    void SetPose(float rotationX, float rotationY, float rotationZ);
+    void SetOffset(float translationX, float translationY, float translationZ);
 };

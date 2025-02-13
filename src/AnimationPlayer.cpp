@@ -20,11 +20,31 @@ const Pose& AnimationPlayer::GetCurrentPose() {
 
 void AnimationPlayer::SetRig(Rig* rig) {
     this->rig = rig;
+
+    // initialise pose with skeleton
+    currentPose = Pose(rig->GetSkeleton());
 }
 
 void AnimationPlayer::Update(float deltaTime) {
     
+    if (!clip) {
+        printf("AnimationPlayer::Update - no clip\n");
+        return;
+    }
+
+    if (!rig) {
+        printf("AnimationPlayer::Update - no rig\n");
+        return;
+    }
+    
     time += deltaTime;
+    // printf("AnimationPlayer::Update - time: %f\n", time);
+
+    // bounds check before pose evaluation
+    if (currentPose.GetNumDOFs() != clip->GetChannels().size()) {
+        printf("AnimationPlayer::Update - pose size mismatch\n");
+        currentPose.Resize(clip->GetChannels().size());
+    }
 
     // clamp time to range
     if (time < clip->GetStartTime()) {
@@ -38,6 +58,10 @@ void AnimationPlayer::Update(float deltaTime) {
 
     // evaluate animation at current time
     clip->Evaluate(time, currentPose);
+    // printf("AnimationPlayer::Update - current pose DOFs: ");
+    // for(int i = 0; i < currentPose.GetNumDOFs(); i++) {
+    //     printf("%f ", currentPose.GetDOF(i).GetValue());
+    // }
 
     // apply pose to rig
     rig->ApplyPose(currentPose);

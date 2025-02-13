@@ -12,6 +12,10 @@ DOF& Pose::GetDOF(int index) {
     return DOFs[index];
 }
 
+int Pose::GetNumDOFs() {
+    return DOFs.size();
+}
+
 Pose::Pose(Skeleton* skeleton) {
 
     // should be equal to the number of channels
@@ -20,4 +24,8 @@ Pose::Pose(Skeleton* skeleton) {
     for (int i = 0; i < DOFs.size(); i++) {
         DOFs[i].SetValue(0.0f);
     }
+}
+
+void Pose::Resize(int size) {
+    DOFs.resize(size);
 }

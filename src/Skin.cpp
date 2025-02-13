@@ -44,7 +44,7 @@ bool Skin::Load(const char* filename, Skeleton* skeleton) {
                 position.y = token.GetFloat();
                 position.z = token.GetFloat();
                 positions[i] = position;
-                printf("Skin::Load - position %d: %f, %f, %f\n", i, position.x, position.y, position.z);
+                // printf("Skin::Load - position %d: %f, %f, %f\n", i, position.x, position.y, position.z);
             }
             token.FindToken("}");
 
@@ -60,7 +60,7 @@ bool Skin::Load(const char* filename, Skeleton* skeleton) {
                 normal.y = token.GetFloat();
                 normal.z = token.GetFloat();
                 normals[i] = normal;
-                printf("Skin::Load - normal %d: %f, %f, %f\n", i, normal.x, normal.y, normal.z);
+                // printf("Skin::Load - normal %d: %f, %f, %f\n", i, normal.x, normal.y, normal.z);
             }
             token.FindToken("}");
 
@@ -81,7 +81,7 @@ bool Skin::Load(const char* filename, Skeleton* skeleton) {
                     weights.push_back(token.GetFloat());
                 }
                 vertices[i] = Vertex(positions[i], normals[i], numAttachments, jointIndices, weights);
-                printf("Skin::Load - vertex %d: %f, %f, %f with %d attachments\n", i, positions[i].x, positions[i].y, positions[i].z, numAttachments);
+                // printf("Skin::Load - vertex %d: %f, %f, %f with %d attachments\n", i, positions[i].x, positions[i].y, positions[i].z, numAttachments);
             }
             token.FindToken("}");
 
@@ -95,7 +95,7 @@ bool Skin::Load(const char* filename, Skeleton* skeleton) {
                 int index1 = token.GetInt();
                 int index2 = token.GetInt();
                 triangles[i] = Triangle(index0, index1, index2);
-                printf("Skin::Load - triangle %d: %d, %d, %d\n", i, index0, index1, index2);
+                // printf("Skin::Load - triangle %d: %d, %d, %d\n", i, index0, index1, index2);
             }
             token.FindToken("}");
 
@@ -127,7 +127,7 @@ bool Skin::Load(const char* filename, Skeleton* skeleton) {
                     matrix[3][row] = token.GetFloat();
                 }
                 bindings[i] = matrix;
-                printf("Skin::Load - loaded binding matrix %d\n", i);
+                // printf("Skin::Load - loaded binding matrix %d\n", i);
                 token.FindToken("}");
             }
             token.FindToken("}");
