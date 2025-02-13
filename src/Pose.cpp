@@ -4,6 +4,14 @@ Pose::Pose() {
     DOFs.resize(0);
 }
 
+void Pose::SetDOF(int index, float DOF) {
+    DOFs[index].SetValue(DOF);
+}
+
+DOF& Pose::GetDOF(int index) {
+    return DOFs[index];
+}
+
 Pose::Pose(Skeleton* skeleton) {
 
     // should be equal to the number of channels

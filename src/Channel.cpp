@@ -155,7 +155,7 @@ float Channel::ExtrapolateIn(float time) {
     } else if (ruleIn == "smooth") {
         v = (p2 - p0) / (t2 - t0);
     } else {
-        printf("Channel::ExtrapolateIn - unrecognised rule: %s\n", ruleIn);
+        printf("Channel::ExtrapolateIn - unrecognised rule: %s\n", ruleIn.c_str());
     }
 
     // predefined cycle stuff
@@ -198,7 +198,7 @@ float Channel::ExtrapolateIn(float time) {
         // bounce animation
         return Evaluate(t0 + remainder);
     } else {
-        printf("Channel::ExtrapolateIn - unrecognised extrapolation: %s, defaulting to constant\n", extrapolationIn);
+        printf("Channel::ExtrapolateIn - unrecognised extrapolation: %s, defaulting to constant\n", extrapolationIn.c_str());
         return p0;
     }
 }
@@ -235,7 +235,7 @@ float Channel::ExtrapolateOut(float time) {
     } else if (ruleOut == "smooth") {
         v = (pN2 - pN) / (tN2 - tN);
     } else {
-        printf("Channel::ExtrapolateOut - unrecognised rule: %s\n", ruleOut);
+        printf("Channel::ExtrapolateOut - unrecognised rule: %s\n", ruleOut.c_str());
     }
 
     // predefined cycle stuff
@@ -266,7 +266,7 @@ float Channel::ExtrapolateOut(float time) {
         // bounce animation
         return Evaluate(tN - length + remainder);
     } else {
-        printf("Channel::ExtrapolateOut - unrecognised extrapolation: %s, defaulting to constant\n", extrapolationOut);
+        printf("Channel::ExtrapolateOut - unrecognised extrapolation: %s, defaulting to constant\n", extrapolationOut.c_str());
         return pN;
     }
 }
