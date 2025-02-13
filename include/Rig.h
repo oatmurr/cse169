@@ -10,7 +10,8 @@ private:
     Skin* skin;
 
 public:
-    Rig(char* skelFilename, char* skinFilename = nullptr);
+    Rig();
+    Rig(Skeleton* skeleton, Skin* skin = nullptr);
     ~Rig();
 
     void ApplyPose(Pose& pose);

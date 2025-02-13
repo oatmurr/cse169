@@ -19,6 +19,7 @@ private:
     glm::vec3 boxMax;
 
     // pose (xyz values to pose DOFs)
+    // note: different from Pose class (which stores the DOFs of all joints)
     std::vector<DOF> pose{DOF(), DOF(), DOF()};
     
     // tree data

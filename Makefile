@@ -16,7 +16,7 @@ $(OBJDIR):
 
 .DEFAULT_GOAL := all
 all: menv
-menv: $(OBJDIR)/main.o $(OBJDIR)/Camera.o $(OBJDIR)/Cube.o $(OBJDIR)/Shader.o $(OBJDIR)/Tokenizer.o $(OBJDIR)/Window.o $(OBJDIR)/DOF.o $(OBJDIR)/Joint.o $(OBJDIR)/Skeleton.o $(OBJDIR)/imgui.o $(OBJDIR)/imgui_demo.o $(OBJDIR)/imgui_draw.o $(OBJDIR)/imgui_tables.o $(OBJDIR)/imgui_widgets.o $(OBJDIR)/imgui_impl_glfw.o $(OBJDIR)/imgui_impl_opengl3.o $(OBJDIR)/Vertex.o $(OBJDIR)/Triangle.o $(OBJDIR)/Skin.o
+menv: $(OBJDIR)/main.o $(OBJDIR)/Camera.o $(OBJDIR)/Cube.o $(OBJDIR)/Shader.o $(OBJDIR)/Tokenizer.o $(OBJDIR)/Window.o $(OBJDIR)/DOF.o $(OBJDIR)/Joint.o $(OBJDIR)/Skeleton.o $(OBJDIR)/imgui.o $(OBJDIR)/imgui_demo.o $(OBJDIR)/imgui_draw.o $(OBJDIR)/imgui_tables.o $(OBJDIR)/imgui_widgets.o $(OBJDIR)/imgui_impl_glfw.o $(OBJDIR)/imgui_impl_opengl3.o $(OBJDIR)/Vertex.o $(OBJDIR)/Triangle.o $(OBJDIR)/Skin.o $(OBJDIR)/Keyframe.o $(OBJDIR)/Channel.o $(OBJDIR)/AnimationClip.o $(OBJDIR)/AnimationPlayer.o $(OBJDIR)/Pose.o $(OBJDIR)/Rig.o
 	$(CC) -o menv $(OBJDIR)/*.o $(LDFLAGS)
 
 # project 1 - skeleton
@@ -78,6 +78,25 @@ $(OBJDIR)/Triangle.o: src/Triangle.cpp include/Triangle.h | $(OBJDIR)
 
 $(OBJDIR)/Skin.o: src/Skin.cpp include/Skin.h | $(OBJDIR)
 	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Skin.cpp -o $(OBJDIR)/Skin.o
+
+# project 3 - animation
+$(OBJDIR)/Keyframe.o: src/Keyframe.cpp include/Keyframe.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Keyframe.cpp -o $(OBJDIR)/Keyframe.o
+
+$(OBJDIR)/Channel.o: src/Channel.cpp include/Channel.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Channel.cpp -o $(OBJDIR)/Channel.o
+
+$(OBJDIR)/AnimationClip.o: src/AnimationClip.cpp include/AnimationClip.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/AnimationClip.cpp -o $(OBJDIR)/AnimationClip.o
+
+$(OBJDIR)/AnimationPlayer.o: src/AnimationPlayer.cpp include/AnimationPlayer.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/AnimationPlayer.cpp -o $(OBJDIR)/AnimationPlayer.o
+
+$(OBJDIR)/Pose.o: src/Pose.cpp include/Pose.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Pose.cpp -o $(OBJDIR)/Pose.o
+
+$(OBJDIR)/Rig.o: src/Rig.cpp include/Rig.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Rig.cpp -o $(OBJDIR)/Rig.o
 
 clean:
 	$(RM) $(OBJDIR)/*.o menv

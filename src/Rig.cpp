@@ -1,16 +1,13 @@
 #include "Rig.h"
 
-Rig::Rig(char* skelFilename, char* skinFilename) {
-    skeleton = new Skeleton();
-    skeleton->Load(skelFilename);
-    skeleton->PopulateJointList();
+Rig::Rig() {
+    skeleton = nullptr;
+    skin = nullptr;
+}
 
-    if (skinFilename) {
-        skin = new Skin();
-        skin->Load(skinFilename, skeleton);
-    } else {
-        skin = nullptr;
-    }
+Rig::Rig(Skeleton* skeleton, Skin* skin) {
+    this->skeleton = skeleton;
+    this->skin = skin;
 }
 
 Rig::~Rig() {

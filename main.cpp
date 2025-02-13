@@ -72,6 +72,10 @@ int main(int argc, char* argv[]) {
             // if there is a .skel file and a .skin file
             if (argc > 2) {
                 Window::skin->Load(argv[2], Window::skeleton);
+
+                if (argc > 3) {
+                    Window::clip->Load(argv[3]);
+                }
             }
         // if there is a .skin file but no .skel file
         } else if (filename.find(".skin") != std::string::npos) {

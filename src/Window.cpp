@@ -9,6 +9,9 @@ const char* Window::windowTitle = "Model Environment";
 // Cube* Window::cube;
 Skeleton* Window::skeleton;
 Skin* Window::skin;
+Rig* Window::rig;
+AnimationClip* Window::clip;
+AnimationPlayer* Window::player;
 
 bool Window::drawSkeleton = true;
 
@@ -66,6 +69,11 @@ bool Window::initializeObjects() {
     // cube = new Cube(glm::vec3(-1, 0, -2), glm::vec3(1, 1, 1));
     skeleton = new Skeleton();
     skin = new Skin();
+    rig = new Rig(skeleton, skin);
+    clip = new AnimationClip();
+    player = new AnimationPlayer();
+    player->SetClip(clip);
+    player->SetRig(rig);
     return true;
 }
 
@@ -74,6 +82,9 @@ void Window::cleanUp() {
     // delete cube;
     delete skeleton;
     delete skin;
+    delete rig;
+    delete clip;
+    delete player;
 
     // Delete the shader program.
     glDeleteProgram(shaderProgram);
@@ -149,12 +160,21 @@ void Window::resizeCallback(GLFWwindow* window, int width, int height) {
 
 // update and draw functions
 void Window::idleCallback() {
+    static float lastTime = glfwGetTime();
+    float currentTime = glfwGetTime();
+    float deltaTime = currentTime - lastTime;
+    lastTime = currentTime;
+    
     // Perform any updates as necessary.
     Cam->Update();
 
-    // cube->update();
-    skeleton->Update();
-    skin->Update();
+    if (player && clip) {
+        player->Update(deltaTime);
+    } else {
+        // cube->update();
+        skeleton->Update();
+        skin->Update();
+    }
 }
 
 void Window::displayCallback(GLFWwindow* window) {

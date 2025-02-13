@@ -2,8 +2,9 @@
 
 #include "Camera.h"
 #include "Shader.h"
-#include "Skeleton.h"
-#include "Skin.h"
+// #include "Skeleton.h"
+// #include "Skin.h"
+#include "AnimationPlayer.h"
 
 // imgui stuff
 #include "imgui/imgui.h"
@@ -21,6 +22,9 @@ public:
     // static Cube* cube;
     static Skeleton* skeleton;
     static Skin* skin;
+    static Rig* rig;
+    static AnimationClip* clip;
+    static AnimationPlayer* player;
 
     // Shader Program
     static GLuint shaderProgram;

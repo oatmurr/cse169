@@ -1,5 +1,26 @@
 #include "AnimationClip.h"
 
+AnimationClip::AnimationClip() {
+    start = 0.0f;
+    end = 0.0f;
+}
+
+float AnimationClip::GetStartTime() const {
+    return start;
+}
+
+float AnimationClip::GetEndTime() const {
+    return end;
+}
+
+void AnimationClip::Evaluate(float time, Pose& pose) {
+    
+    for (int i = 0; i < channels.size(); i++) {
+        // evaluate channel at time and update pose
+        pose.SetDOF(i, channels[i].Evaluate(time));
+    }
+}
+
 bool AnimationClip::Load(const char *filename) {
     
     Tokenizer token;
@@ -15,8 +36,8 @@ bool AnimationClip::Load(const char *filename) {
             token.FindToken("{");
             // range
             if (strcmp(temp, "range") == 0) {
-                startTime = token.GetFloat();
-                endTime = token.GetFloat();
+                start = token.GetFloat();
+                end = token.GetFloat();
             // numchannels
             } else if (strcmp(temp, "numchannels") == 0) {
                 int numChannels = token.GetInt();

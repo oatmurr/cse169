@@ -12,6 +12,7 @@ private:
     std::vector<DOF> DOFs;
 
 public:
+    Pose();
     Pose(Skeleton* skeleton);
     
     // getters and setters

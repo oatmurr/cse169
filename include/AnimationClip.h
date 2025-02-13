@@ -6,12 +6,15 @@
 class AnimationClip {
 
 private:
-    float startTime, endTime;
+    float start, end;
     std::vector<Channel> channels;
 
 public:
     AnimationClip();
-    ~AnimationClip();
+
+    // getters and setters
+    float GetStartTime() const;
+    float GetEndTime() const;
     
     // evaluate animation at a given time and update pose
     void Evaluate(float time, Pose& pose);
