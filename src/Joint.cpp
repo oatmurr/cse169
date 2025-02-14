@@ -1,7 +1,7 @@
 #include "Joint.h"
 
 Joint::Joint() {
-    printf("Joint::Joint() - constructing joint\n");
+    // printf("Joint::Joint() - constructing joint\n");
     localMatrix = glm::mat4(1.0f);
     worldMatrix = glm::mat4(1.0f);
 
@@ -74,13 +74,9 @@ bool Joint::Load(Tokenizer& token) {
             printf("Joint::Load - rotzlimit: %f, %f\n", min, max);
         // check for 'pose' token
         } else if (strcmp(temp, "pose") == 0) {
-            initialPose[0].SetValue(token.GetFloat());
-            initialPose[1].SetValue(token.GetFloat());
-            initialPose[2].SetValue(token.GetFloat());
-            printf("Joint::Load - initial pose: %f, %f, %f\n", initialPose[0].GetValue(), initialPose[1].GetValue(), initialPose[2].GetValue());
-            pose[0].SetValue(initialPose[0].GetValue());
-            pose[1].SetValue(initialPose[1].GetValue());
-            pose[2].SetValue(initialPose[2].GetValue());
+            pose[0].SetValue(token.GetFloat());
+            pose[1].SetValue(token.GetFloat());
+            pose[2].SetValue(token.GetFloat());
             printf("Joint::Load - pose: %f, %f, %f\n", pose[0].GetValue(), pose[1].GetValue(), pose[2].GetValue());
         // check for child 'balljoint; token
         } else if (strcmp(temp, "balljoint") == 0) {
@@ -102,43 +98,20 @@ bool Joint::Load(Tokenizer& token) {
 
 void Joint::Update(glm::mat4& parentWorld) {
     // printf("joint %s:\n", name.c_str());
-    // printf("  initial pose: Z=%f Y=%f X=%f\n", initialPose[2].GetValue(), initialPose[1].GetValue(), initialPose[0].GetValue());
-    // printf("  animation rotations: Z=%f Y=%f X=%f\n", pose[2].GetValue(), pose[1].GetValue(), pose[0].GetValue());
 
     // compute local matrix L
     // initialize local matrix with identity matrix and translate by offset vector
     localMatrix = glm::translate(glm::mat4(1.0f), offset);
 
-    // apply initial pose zyx order
-    localMatrix = glm::rotate(localMatrix, initialPose[2].GetValue(), glm::vec3(0.0f, 0.0f, 1.0f));
-    localMatrix = glm::rotate(localMatrix, initialPose[1].GetValue(), glm::vec3(0.0f, 1.0f, 0.0f));
-    localMatrix = glm::rotate(localMatrix, initialPose[0].GetValue(), glm::vec3(1.0f, 0.0f, 0.0f));
-
-    // // apply initial pose xyz order
-    // // localMatrix = glm::rotate(localMatrix, initialPose[0].GetValue(), glm::vec3(1.0f, 0.0f, 0.0f));
-    // // localMatrix = glm::rotate(localMatrix, initialPose[1].GetValue(), glm::vec3(0.0f, 1.0f, 0.0f));
-    // // localMatrix = glm::rotate(localMatrix, initialPose[2].GetValue(), glm::vec3(0.0f, 0.0f, 1.0f));
-
-    // // // rotate around z-axis (roll) using pose z value
-    // // localMatrix = glm::rotate(localMatrix, pose[2].GetValue(), glm::vec3(0.0f, 0.0f, 1.0f));
-    // // // rotate around y-axis (yaw) using pose y value
-    // // localMatrix = glm::rotate(localMatrix, pose[1].GetValue(), glm::vec3(0.0f, 1.0f, 0.0f));
-    // // // rotate around x-axis (pitch) using pose x value
-    // // localMatrix = glm::rotate(localMatrix, pose[0].GetValue(), glm::vec3(1.0f, 0.0f, 0.0f));
-
-    // apply animation rotations zyx order
+    // rotate around z-axis (roll) using pose z value
     localMatrix = glm::rotate(localMatrix, pose[2].GetValue(), glm::vec3(0.0f, 0.0f, 1.0f));
+    // rotate around y-axis (yaw) using pose y value
     localMatrix = glm::rotate(localMatrix, pose[1].GetValue(), glm::vec3(0.0f, 1.0f, 0.0f));
+    // rotate around x-axis (pitch) using pose x value
     localMatrix = glm::rotate(localMatrix, pose[0].GetValue(), glm::vec3(1.0f, 0.0f, 0.0f));
-
-    // apply animation rotations xyz order
-    // localMatrix = glm::rotate(localMatrix, pose[0].GetValue(), glm::vec3(1.0f, 0.0f, 0.0f));
-    // localMatrix = glm::rotate(localMatrix, pose[1].GetValue(), glm::vec3(0.0f, 1.0f, 0.0f));
-    // localMatrix = glm::rotate(localMatrix, pose[2].GetValue(), glm::vec3(0.0f, 0.0f, 1.0f));
 
     // compute world matrix W
     worldMatrix = parentWorld * localMatrix;
-    // worldMatrix = localMatrix * parentWorld;
 
     // recursively call update() on children
     for (Joint* child : children) {
@@ -178,7 +151,7 @@ DOF& Joint::GetDOF(int index) {
 }
 
 void Joint::PopulateJointList(std::vector<Joint*>& jointList) {
-    printf("Joint::PopulateJointList - adding joint %s at index %d\n", name.c_str(), jointList.size());
+    // printf("Joint::PopulateJointList - adding joint %s at index %d\n", name.c_str(), jointList.size());
     jointList.push_back(this);
     for (Joint* child : children) {
         child->PopulateJointList(jointList);
@@ -190,6 +163,7 @@ glm::mat4 Joint::GetWorldMatrix() {
 }
 
 void Joint::SetPose(float rotationX, float rotationY, float rotationZ) {
+    // printf("Joint::SetPose - setting pose to %f, %f, %f\n", rotationX, rotationY, rotationZ);
     pose[0].SetValue(rotationX);
     pose[1].SetValue(rotationY);
     pose[2].SetValue(rotationZ);

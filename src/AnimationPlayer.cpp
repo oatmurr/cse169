@@ -1,8 +1,10 @@
 #include "AnimationPlayer.h"
 
 AnimationPlayer::AnimationPlayer() {
-    time = 0.0f;
+    // time = 0.0f;
+    time = -5.0f;
     clip = nullptr;
+    rig = nullptr;
 }
 
 AnimationPlayer::~AnimationPlayer() {
@@ -47,14 +49,14 @@ void AnimationPlayer::Update(float deltaTime) {
     }
 
     // clamp time to range
-    if (time < clip->GetStartTime()) {
-        time = clip->GetStartTime();
-    }
+    // if (time < clip->GetStartTime()) {
+    //     time = clip->GetStartTime();
+    // }
 
     // loop animation
-    if (time > clip->GetEndTime()) {
-        time = 0.0f;
-    }
+    // if (time > clip->GetEndTime()) {
+    //     time = 0.0f;
+    // }
 
     // evaluate animation at current time
     clip->Evaluate(time, currentPose);

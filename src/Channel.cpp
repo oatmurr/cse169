@@ -255,7 +255,7 @@ float Channel::ExtrapolateIn(float time) {
 
     // predefined cycle stuff
     float length = tN - t0;
-    float cycles = floor(abs(dt) / length);
+    float cycles = floor(abs(dt) / length) + 1;
     float remainder = fmod(abs(dt), length);
 
     // extrapolation evaluation
@@ -278,7 +278,9 @@ float Channel::ExtrapolateIn(float time) {
             remainder = length - remainder;
         }
         // calculate progressive offset
-        float offset = (pN - p0) * cycles;
+        float offset = (pN - p0) * abs(cycles);
+        printf("Channel::ExtrapolateIn - offset: %f\n", offset);
+        printf("Channel::ExtrapolateIn - cycles: %f\n", cycles);
         // cycle animation with offset
         return Evaluate(t0 + remainder) - offset;
     } else if (extrapolationIn == "bounce") {
@@ -345,8 +347,8 @@ float Channel::ExtrapolateOut(float time) {
 
     // predefined cycle stuff
     float length = tN - t0;
-    float cycles = floor(dt / length);
-    float remainder = fmod(dt, length);
+    float cycles = floor(abs(dt) / length) + 1;
+    float remainder = fmod(abs(dt), length);
 
     // extrapolation evaluation
     if (extrapolationOut == "constant") {
@@ -360,7 +362,9 @@ float Channel::ExtrapolateOut(float time) {
         return Evaluate(tN - length + remainder);
     } else if (extrapolationOut == "cycle_offset") {
         // calculate progressive offset
-        float offset = (pN - p0) * cycles;
+        float offset = (pN - p0) * abs(cycles);
+        printf("Channel::ExtrapolateOut - offset: %f\n", offset);
+        printf("Channel::ExtrapolateOut - cycles: %f\n", cycles);
         // cycle animation with offset
         return Evaluate(tN - length + remainder) + offset;
     } else if (extrapolationOut == "bounce") {

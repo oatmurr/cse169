@@ -22,9 +22,6 @@ private:
     // note: different from Pose class (which stores the DOFs of all joints)
     std::vector<DOF> pose{DOF(), DOF(), DOF()};
 
-    // initial pose from .skel file
-    std::vector<DOF> initialPose{DOF(), DOF(), DOF()};
-
     // tree data
     std::vector<Joint*> children;
     Joint* parent;
