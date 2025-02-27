@@ -58,6 +58,10 @@ float Particle::GetMass() {
     return mass;
 }
 
+bool Particle::IsFixed() {
+    return fixed;
+}
+
 void Particle::SetPosition(glm::vec3 position) {
     this->position = position;
 }

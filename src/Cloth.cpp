@@ -338,3 +338,13 @@ void Cloth::UpdateBuffers() {
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+
+void Cloth::Translate(glm::vec3 translation) {
+    for (Particle* particle : particles) {
+        if (particle->IsFixed()) {
+            particle->SetPosition(particle->GetPosition() + translation);
+        }
+    }
+
+    UpdateBuffers();
+}

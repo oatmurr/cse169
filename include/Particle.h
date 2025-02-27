@@ -24,6 +24,7 @@ public:
     glm::vec3 GetPosition();
     glm::vec3 GetVelocity();
     float GetMass();
+    bool IsFixed();
     void SetPosition(glm::vec3 position);
     void SetVelocity(glm::vec3 velocity);
 };

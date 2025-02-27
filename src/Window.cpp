@@ -364,6 +364,40 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
                 resetCamera();
                 break;
 
+            #ifdef INCLUDE_CLOTH
+            // fixed particle control
+            case GLFW_KEY_W: // move north (-z)
+                if (cloth) {
+                    cloth->Translate(glm::vec3(0.0f, 0.0f, -0.1f));
+                }
+                break;
+            case GLFW_KEY_S: // move south (+z)
+                if (cloth) {
+                    cloth->Translate(glm::vec3(0.0f, 0.0f, 0.1f));
+                }
+                break;
+            case GLFW_KEY_A: // move west (-x)
+                if (cloth) {
+                    cloth->Translate(glm::vec3(-0.1f, 0.0f, 0.0f));
+                }
+                break;
+            case GLFW_KEY_D: // move east (+x)
+                if (cloth) {
+                    cloth->Translate(glm::vec3(0.1f, 0.0f, 0.0f));
+                }
+                break;
+            case GLFW_KEY_Q: // move up (+y)
+                if (cloth) {
+                    cloth->Translate(glm::vec3(0.0f, 0.1f, 0.0f));
+                }
+                break;
+            case GLFW_KEY_E: // move down (-y)
+                if (cloth) {
+                    cloth->Translate(glm::vec3(0.0f, -0.1f, 0.0f));
+                }
+                break;
+            #endif
+
             default:
                 break;
         }

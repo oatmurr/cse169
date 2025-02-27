@@ -42,4 +42,6 @@ public:
     void SetupBuffers();
 
     void UpdateBuffers();
+
+    void Translate(glm::vec3 translation);
 };
