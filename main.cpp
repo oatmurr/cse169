@@ -65,22 +65,35 @@ int main(int argc, char* argv[]) {
     // command line stuff
     if (argc > 1) {
         std::string filename = argv[1];
+
+        #ifdef INCLUDE_SKELETON
         // if there is a .skel file
-        if (filename.find(".skel") != std::string::npos) {
+        if ((filename.find(".skel") != std::string::npos) && Window::skeleton) {
             Window::skeleton->Load(argv[1]);
             Window::skeleton->PopulateJointList();
+
+            #ifdef INCLUDE_SKIN
             // if there is a .skel file and a .skin file
-            if (argc > 2) {
+            if (argc > 2 && Window::skin) {
                 Window::skin->Load(argv[2], Window::skeleton);
 
-                if (argc > 3) {
+                #ifdef INCLUDE_ANIMMATION
+                // if there is a .skel file, a .skin file, and a .anim file
+                if (argc > 3 && Window::clip) {
                     Window::clip->Load(argv[3]);
                 }
+                #endif
             }
+            #endif
+        }
+        #endif
+
+        #ifdef INCLUDE_SKIN
         // if there is a .skin file but no .skel file
-        } else if (filename.find(".skin") != std::string::npos) {
-        Window::skin->Load(argv[1], nullptr);
-        } 
+        if ((filename.find(".skin") != std::string::npos) && Window::skin) {
+            Window::skin->Load(argv[1], nullptr);
+        }
+        #endif
     }
 
     // Loop while GLFW window should stay open.

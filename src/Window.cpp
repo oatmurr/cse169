@@ -7,19 +7,32 @@ const char* Window::windowTitle = "Model Environment";
 
 // Objects to render
 // Cube* Window::cube;
+
+#ifdef INCLUDE_SKELETON
 Skeleton* Window::skeleton;
+#endif
+
+#ifdef INCLUDE_SKIN
 Skin* Window::skin;
+#endif
+
+#ifdef INCLUDE_ANIMATION
 Rig* Window::rig;
 AnimationClip* Window::clip;
 AnimationPlayer* Window::player;
+#endif
 
+#ifdef INCLUDE_SKELETON
 bool Window::drawSkeleton = true;
+#endif
 
 // project 2 lighting stuff
+#ifdef INCLUDE_SKIN
 glm::vec3 Window::lightDirection1;
 glm::vec3 Window::lightColor1;
 glm::vec3 Window::lightDirection2;
 glm::vec3 Window::lightColor2;
+#endif
 
 // Camera Properties
 Camera* Cam;
@@ -32,8 +45,10 @@ int MouseX, MouseY;
 GLuint Window::shaderProgram;
 
 // imgui stuff
+#ifdef INCLUDE_SKELETON
 static Joint* selectedJoint = nullptr;
 static int currentJointIndex = 0;
+#endif
 
 // Constructors and desctructors
 // bool Window::initializeProgram() {
@@ -42,10 +57,12 @@ bool Window::initializeProgram(GLFWwindow* window) {
     shaderProgram = LoadShaders("shaders/shader.vert", "shaders/shader.frag");
 
     // project 2 lighting stuff
+    #ifdef INCLUDE_SKIN
     lightDirection1 = glm::normalize(glm::vec3(1, 5, 2));
     lightColor1 = glm::vec3(1.0f, 0.0f, 0.0f); // red light
     lightDirection2 = glm::normalize(glm::vec3(-2, -3, 1));
     lightColor2 = glm::vec3(0.0f, 0.0f, 1.0f); // blue light
+    #endif
 
     // set up imgui
     IMGUI_CHECKVERSION();
@@ -67,24 +84,53 @@ bool Window::initializeObjects() {
     // Create a cube
     // cube = new Cube();
     // cube = new Cube(glm::vec3(-1, 0, -2), glm::vec3(1, 1, 1));
+
+    #ifdef INCLUDE_SKELETON
     skeleton = new Skeleton();
+    #endif
+
+    #ifdef INCLUDE_SKIN
     skin = new Skin();
+    #endif
+
+    #ifdef INCLUDE_ANIMATION
+    if (skeleton == nullptr) {
+        std::cerr << "failed to initialize skeleton" << std::endl;
+        return false;
+    }
+
+    if (skin == nullptr) {
+        std::cerr << "failed to initialize skin" << std::endl;
+        return false;
+    }
+
     rig = new Rig(skeleton, skin);
     clip = new AnimationClip();
     player = new AnimationPlayer();
     player->SetClip(clip);
     player->SetRig(rig);
+    #endif
+
     return true;
 }
 
 void Window::cleanUp() {
     // Deallcoate the objects.
     // delete cube;
+
+    #ifdef INCLUDE_SKELETON
     delete skeleton;
+    #endif
+
+    #ifdef INCLUDE_SKIN
     delete skin;
+    #endif
+
+    #ifdef INCLUDE_ANIMATION
     delete rig;
     delete clip;
     delete player;
+    #endif
 
     // Delete the shader program.
     glDeleteProgram(shaderProgram);
@@ -168,13 +214,45 @@ void Window::idleCallback() {
     // Perform any updates as necessary.
     Cam->Update();
 
+    #ifdef INCLUDE_ANIMATION
     if (player && clip) {
         player->Update(deltaTime);
     } else {
         // cube->update();
+
+        #ifdef INCLUDE_SKELETON
+        if (skeleton == nullptr) {
+            std::cerr << "failed to initialize skeleton" << std::endl;
+            return;
+        }
         skeleton->Update();
+        #endif
+
+        #ifdef INCLUDE_SKIN
+        if (skin == nullptr) {
+            std::cerr << "failed to initialize skin" << std::endl;
+            return;
+        }
         skin->Update();
+        #endif
     }
+    #else
+        #ifdef INCLUDE_SKELETON
+        if (skeleton == nullptr) {
+            std::cerr << "failed to initialize skeleton" << std::endl;
+            return;
+        }
+        skeleton->Update();
+        #endif
+
+        #ifdef INCLUDE_SKIN
+        if (skin == nullptr) {
+            std::cerr << "failed to initialize skin" << std::endl;
+            return;
+        }
+        skin->Update();
+        #endif
+    #endif
 }
 
 void Window::displayCallback(GLFWwindow* window) {
@@ -189,17 +267,27 @@ void Window::displayCallback(GLFWwindow* window) {
 
     // Render the object.
     // cube->draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
-    if (drawSkeleton) {
+
+    #ifdef INCLUDE_SKELETON
+    if (drawSkeleton && skeleton) {
         skeleton->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
     }
-    skin->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram, lightDirection1, lightColor1, lightDirection2, lightColor2);
+    #endif
+
+    #ifdef INCLUDE_SKIN
+    if (skin) {
+        skin->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram, lightDirection1, lightColor1, lightDirection2, lightColor2);
+    }
+    #endif
 
     // create imgui window
+    #ifdef INCLUDE_SKELETON
     ImGui::Begin("joints");
 
     RenderJointControls();
 
     ImGui::End();
+    #endif
 
     ImGui::ShowDemoWindow();
 
@@ -275,6 +363,7 @@ void Window::cursor_callback(GLFWwindow* window, double currX, double currY) {
     }
 }
 
+#ifdef INCLUDE_SKELETON
 void Window::RenderJointControls() {
     
     ImGui::Checkbox("draw skeleton", &drawSkeleton);
@@ -350,7 +439,6 @@ void Window::RenderJointControls() {
         if (ImGui::InputFloat("z-rotation", &z)) {
             selectedJoint->GetDOF(2).SetValue(z);
         }
-
-        
     }
 }
+#endif

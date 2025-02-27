@@ -2,9 +2,18 @@
 
 #include "Camera.h"
 #include "Shader.h"
-// #include "Skeleton.h"
-// #include "Skin.h"
+
+#ifdef INCLUDE_SKELETON
+#include "Skeleton.h"
+#endif
+
+#ifdef INCLUDE_SKIN
+#include "Skin.h"
+#endif
+
+#ifdef INCLUDE_ANIMATION
 #include "AnimationPlayer.h"
+#endif
 
 // imgui stuff
 #include "imgui/imgui.h"
@@ -20,11 +29,20 @@ public:
 
     // Objects to render
     // static Cube* cube;
+
+    #ifdef INCLUDE_SKELETON
     static Skeleton* skeleton;
+    #endif
+
+    #ifdef INCLUDE_SKIN
     static Skin* skin;
+    #endif
+
+    #ifdef INCLUDE_ANIMATION
     static Rig* rig;
     static AnimationClip* clip;
     static AnimationPlayer* player;
+    #endif
 
     // Shader Program
     static GLuint shaderProgram;
@@ -52,12 +70,16 @@ public:
     static void cursor_callback(GLFWwindow* window, double currX, double currY);
 
     // imgui stuff
+    #ifdef INCLUDE_SKELETON
     static void RenderJointControls();
     static bool drawSkeleton;
+    #endif
 
     // project 2 lighting stuff
+    #ifdef INCLUDE_SKIN
     static glm::vec3 lightDirection1;
     static glm::vec3 lightColor1;
     static glm::vec3 lightDirection2;
     static glm::vec3 lightColor2;
+    #endif
 };

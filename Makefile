@@ -14,10 +14,44 @@ RM = /bin/rm -f
 $(OBJDIR):
 	mkdir -p $(OBJDIR)
 
-.DEFAULT_GOAL := all
-all: menv
-menv: $(OBJDIR)/main.o $(OBJDIR)/Camera.o $(OBJDIR)/Cube.o $(OBJDIR)/Shader.o $(OBJDIR)/Tokenizer.o $(OBJDIR)/Window.o $(OBJDIR)/DOF.o $(OBJDIR)/Joint.o $(OBJDIR)/Skeleton.o $(OBJDIR)/imgui.o $(OBJDIR)/imgui_demo.o $(OBJDIR)/imgui_draw.o $(OBJDIR)/imgui_tables.o $(OBJDIR)/imgui_widgets.o $(OBJDIR)/imgui_impl_glfw.o $(OBJDIR)/imgui_impl_opengl3.o $(OBJDIR)/Vertex.o $(OBJDIR)/Triangle.o $(OBJDIR)/Skin.o $(OBJDIR)/Keyframe.o $(OBJDIR)/Channel.o $(OBJDIR)/AnimationClip.o $(OBJDIR)/AnimationPlayer.o $(OBJDIR)/Pose.o $(OBJDIR)/Rig.o
-	$(CC) -o menv $(OBJDIR)/*.o $(LDFLAGS)
+# imgui needed for all projects
+IMGUI_OBJS = $(OBJDIR)/imgui.o $(OBJDIR)/imgui_demo.o $(OBJDIR)/imgui_draw.o \
+             $(OBJDIR)/imgui_tables.o $(OBJDIR)/imgui_widgets.o \
+             $(OBJDIR)/imgui_impl_glfw.o $(OBJDIR)/imgui_impl_opengl3.o
+
+# project 1 - skeleton
+SKELETON_OBJS = $(OBJDIR)/main.o $(OBJDIR)/Camera.o $(OBJDIR)/Cube.o \
+                $(OBJDIR)/Shader.o $(OBJDIR)/Tokenizer.o $(OBJDIR)/Window.o \
+                $(OBJDIR)/DOF.o $(OBJDIR)/Joint.o $(OBJDIR)/Skeleton.o
+
+# project 2 - skin (includes skeleton)
+SKIN_OBJS = $(SKELETON_OBJS) $(OBJDIR)/Vertex.o $(OBJDIR)/Triangle.o $(OBJDIR)/Skin.o
+
+# project 3 - animation (includes skin)
+ANIMATION_OBJS = $(SKIN_OBJS) $(OBJDIR)/Keyframe.o $(OBJDIR)/Channel.o \
+                 $(OBJDIR)/AnimationClip.o $(OBJDIR)/AnimationPlayer.o \
+                 $(OBJDIR)/Pose.o $(OBJDIR)/Rig.o
+
+# .DEFAULT_GOAL := all
+# all: menv
+# menv: $(ANIMATION_OBJS) $(IMGUI_OBJS)
+# 	$(CC) -o menv $(OBJDIR)/*.o $(LDFLAGS)
+
+SKELETON_DEFS = -DINCLUDE_SKELETON
+SKIN_DEFS = -DINCLUDE_SKELETON -DINCLUDE_SKIN
+ANIMATION_DEFS = -DINCLUDE_SKELETON -DINCLUDE_SKIN -DINCLUDE_ANIMATION
+
+skeleton: CFLAGS += $(SKELETON_DEFS)
+skeleton: $(SKELETON_OBJS) $(IMGUI_OBJS)
+	$(CC) -o menv $(SKELETON_OBJS) $(IMGUI_OBJS) $(LDFLAGS)
+
+skin: CFLAGS += $(SKIN_DEFS)
+skin: $(SKIN_OBJS) $(IMGUI_OBJS)
+	$(CC) -o menv $(SKIN_OBJS) $(IMGUI_OBJS) $(LDFLAGS)
+
+animation: CFLAGS += $(ANIMATION_DEFS)
+animation: $(ANIMATION_OBJS) $(IMGUI_OBJS)
+	$(CC) -o menv $(ANIMATION_OBJS) $(IMGUI_OBJS) $(LDFLAGS)
 
 # project 1 - skeleton
 $(OBJDIR)/main.o: main.cpp include/Window.h | $(OBJDIR)
