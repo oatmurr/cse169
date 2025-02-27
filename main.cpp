@@ -66,6 +66,36 @@ int main(int argc, char* argv[]) {
     if (argc > 1) {
         std::string filename = argv[1];
 
+        // #ifdef INCLUDE_CLOTH
+        if (filename == "-cloth") {
+            
+            // default cloth
+            int width = 20;
+            int height = 20;
+            float spacing = 0.2f;
+            float mass = 0.5f;
+            float springConstant = 50.0f;
+            float dampingConstant = 2.0f;
+
+            // parse additional parameters if provided
+            if (argc > 2) width = std::stoi(argv[2]);
+            if (argc > 3) height = std::stoi(argv[3]);
+            if (argc > 4) spacing = std::stof(argv[4]);
+            if (argc > 5) mass = std::stof(argv[5]);
+            if (argc > 6) springConstant = std::stof(argv[6]);
+            if (argc > 7) dampingConstant = std::stof(argv[7]);
+
+            // create cloth
+            Window::cloth = new Cloth(width, height, spacing, mass, springConstant, dampingConstant);
+            
+            if (Window::cloth) {
+                std::cout << "cloth created with dimensions: " << width << "x" << height << std::endl;
+            } else {
+                std::cout << "failed to create cloth!" << std::endl;
+            }
+        }
+        // #endif
+
         #ifdef INCLUDE_SKELETON
         // if there is a .skel file
         if ((filename.find(".skel") != std::string::npos) && Window::skeleton) {

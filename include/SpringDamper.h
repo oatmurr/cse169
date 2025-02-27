@@ -17,4 +17,8 @@ public:
     
     // compute and apply spring-damper forces
     void ComputeForce();
+
+    // getters and setters
+    Particle* GetP1();
+    Particle* GetP2();
 };

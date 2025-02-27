@@ -24,14 +24,43 @@ void ClothTriangle::ComputeAerodynamicForce(glm::vec3 wind) {
     // area (a0) of triangle
     float area = 0.5f * glm::length(glm::cross(p2->GetPosition() - p1->GetPosition(), p3->GetPosition() - p1->GetPosition()));
 
+    // degenerate triangle
+    if (area < 0.0001f) {
+        std::cout << "ClothTriangle::ComputeAerodynamicForce: current length is zero" << std::endl;
+        return;
+    }
+
     // cross-sectional area (a) which is the area viewed from the direction of the airflow
     float crossSectionalArea = area * glm::dot(glm::normalize(velocity), normal);
 
     // aerodynamic force
-    glm::vec3 aerodynamicForce = (-1/2) * fluidDensity * speed * speed * dragCoefficient * crossSectionalArea * normal;
+    glm::vec3 aerodynamicForce = (-1.0f/2.0f) * fluidDensity * speed * speed * dragCoefficient * crossSectionalArea * normal;
 
     // apply 1/3 of the total force to each of the three particles connecting the triangle
     p1->ApplyForce(aerodynamicForce / 3.0f);
     p2->ApplyForce(aerodynamicForce / 3.0f);
     p3->ApplyForce(aerodynamicForce / 3.0f);
+}
+
+Particle* ClothTriangle::GetP1() {
+    return p1;
+}
+
+Particle* ClothTriangle::GetP2() {
+    return p2;
+}
+
+Particle* ClothTriangle::GetP3() {
+    return p3;
+}
+
+glm::vec3 ClothTriangle::ComputeNormal() {
+
+    glm::vec3 position1 = p1->GetPosition();
+    glm::vec3 position2 = p2->GetPosition();
+    glm::vec3 position3 = p3->GetPosition();
+
+    glm::vec3 normal = glm::normalize(glm::cross(position2 - position1, position3 - position1));
+
+    return normal;
 }

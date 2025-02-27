@@ -1,3 +1,5 @@
+#pragma once
+
 #include "SpringDamper.h"
 
 class ClothTriangle {
@@ -17,4 +19,10 @@ public:
 
     // aerodynamicForce = (-1/2) * 𝜌 * |𝐯|^2 * 𝑐𝑑 * 𝑎 * 𝐧
     void ComputeAerodynamicForce(glm::vec3 wind);
+
+    glm::vec3 ComputeNormal();
+
+    Particle* GetP1();
+    Particle* GetP2();
+    Particle* GetP3();
 };

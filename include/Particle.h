@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core.h"
+#include <iostream>
 
 class Particle {
 private:

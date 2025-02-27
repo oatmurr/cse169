@@ -20,6 +20,13 @@ void Particle::Integrate(float dt) {
         // apply newton's second law (f = ma)
         glm::vec3 acceleration = force / mass;
 
+        // check for NaN or large values
+        if (glm::any(glm::isnan(acceleration)) || glm::length(acceleration) > 1000.0f) {
+            // reset to safe values
+            acceleration = glm::vec3(0.0f);
+            velocity = glm::vec3(0.0f);
+        }
+
         // forward euler integration to get new velocity
         velocity += acceleration * dt;
 

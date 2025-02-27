@@ -50,6 +50,12 @@ static Joint* selectedJoint = nullptr;
 static int currentJointIndex = 0;
 #endif
 
+// #ifdef INCLUDE_CLOTH
+Cloth* Window::cloth;
+glm::vec3 Window::wind = glm::vec3(0.0f, 0.0f, 0.0f);
+bool Window::pauseSimulation = false;
+// #endif
+
 // Constructors and desctructors
 // bool Window::initializeProgram() {
 bool Window::initializeProgram(GLFWwindow* window) {
@@ -76,6 +82,11 @@ bool Window::initializeProgram(GLFWwindow* window) {
         std::cerr << "Failed to initialize shader program" << std::endl;
         return false;
     }
+
+    // #ifdef INCLUDE_CLOTH
+    wind = glm::vec3(0.0f, 0.0f, 0.0f);
+    pauseSimulation = false;
+    // #endif
 
     return true;
 }
@@ -111,6 +122,10 @@ bool Window::initializeObjects() {
     player->SetRig(rig);
     #endif
 
+    // #ifdef INCLUDE_CLOTH
+    cloth = nullptr;
+    // #endif
+
     return true;
 }
 
@@ -131,6 +146,10 @@ void Window::cleanUp() {
     delete clip;
     delete player;
     #endif
+
+    // #ifdef INCLUDE_CLOTH
+    delete cloth;
+    // #endif
 
     // Delete the shader program.
     glDeleteProgram(shaderProgram);
@@ -214,11 +233,12 @@ void Window::idleCallback() {
     // Perform any updates as necessary.
     Cam->Update();
 
+    // cube->update();
+
     #ifdef INCLUDE_ANIMATION
     if (player && clip) {
         player->Update(deltaTime);
     } else {
-        // cube->update();
 
         #ifdef INCLUDE_SKELETON
         if (skeleton == nullptr) {
@@ -253,6 +273,13 @@ void Window::idleCallback() {
         skin->Update();
         #endif
     #endif
+
+    // #ifdef INCLUDE_CLOTH
+    if (cloth && !pauseSimulation) {
+        cloth->SetWind(wind);
+        cloth->Simulate(deltaTime);
+    }
+    // #endif
 }
 
 void Window::displayCallback(GLFWwindow* window) {
@@ -283,11 +310,25 @@ void Window::displayCallback(GLFWwindow* window) {
     // create imgui window
     #ifdef INCLUDE_SKELETON
     ImGui::Begin("joints");
-
     RenderJointControls();
-
     ImGui::End();
     #endif
+
+    // #ifdef INCLUDE_CLOTH
+    if (cloth) {
+        std::cout << "About to draw cloth..." << std::endl;
+        cloth->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+        std::cout << "Finished drawing cloth" << std::endl;
+
+        
+    }
+    // #endif
+
+    // #ifdef INCLUDE_CLOTH
+    ImGui::Begin("cloth");
+    RenderClothControls();
+    ImGui::End();
+    // #endif
 
     ImGui::ShowDemoWindow();
 
@@ -304,7 +345,8 @@ void Window::displayCallback(GLFWwindow* window) {
 
 // helper to reset the camera
 void Window::resetCamera() {
-    Cam->Reset();
+    Cam->Reset();  
+
     Cam->SetAspect(float(Window::width) / float(Window::height));
 }
 
@@ -442,3 +484,21 @@ void Window::RenderJointControls() {
     }
 }
 #endif
+
+// #ifdef INCLUDE_CLOTH
+void Window::RenderClothControls() {
+
+    ImGui::Text("wind");
+    ImGui::SliderFloat("wind-x", &wind.x, -10.0f, 10.0f);
+    ImGui::SliderFloat("wind-y", &wind.y, -10.0f, 10.0f);
+    ImGui::SliderFloat("wind-z", &wind.z, -10.0f, 10.0f);
+
+    if (ImGui::Button("reset wind")) {
+        wind = glm::vec3(0.0f, 0.0f, 0.0f);
+    }
+
+    ImGui::Separator();
+
+    ImGui::Checkbox("pause simulation", &pauseSimulation);
+}
+// #endif

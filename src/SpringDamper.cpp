@@ -12,6 +12,13 @@ void SpringDamper::ComputeForce() {
     // compute current length (l) and unit vector (e)
     glm::vec3 distance = p2->GetPosition() - p1->GetPosition();
     float currentLength = glm::length(distance);
+
+     // avoid division by zero
+     if (currentLength < 0.0001f) {
+        std::cout << "SpringDamper::ComputeForce: current length is zero" << std::endl;
+        return;
+    }
+
     glm::vec3 unitVector = distance / currentLength;
 
     // compute closing velocity (vclose)
@@ -27,4 +34,12 @@ void SpringDamper::ComputeForce() {
 
     // apply force f2 = -f1
     p2->ApplyForce(-springForce - dampingForce);
+}
+
+Particle* SpringDamper::GetP1() {
+    return p1;
+}
+
+Particle* SpringDamper::GetP2() {
+    return p2;
 }

@@ -2,6 +2,7 @@
 
 #include "Camera.h"
 #include "Shader.h"
+// #include "Cube.h"
 
 #ifdef INCLUDE_SKELETON
 #include "Skeleton.h"
@@ -14,6 +15,10 @@
 #ifdef INCLUDE_ANIMATION
 #include "AnimationPlayer.h"
 #endif
+
+// #ifdef INCLUDE_CLOTH
+#include "Cloth.h"
+// #endif
 
 // imgui stuff
 #include "imgui/imgui.h"
@@ -43,6 +48,13 @@ public:
     static AnimationClip* clip;
     static AnimationPlayer* player;
     #endif
+
+    // #ifdef INCLUDE_CLOTH
+    static Cloth* cloth;
+    static glm::vec3 wind;
+    static bool pauseSimulation;
+    static void RenderClothControls();
+    // #endif
 
     // Shader Program
     static GLuint shaderProgram;
