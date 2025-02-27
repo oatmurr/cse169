@@ -13,7 +13,7 @@ private:
     Particle* p2;
 
 public:
-    SpringDamper(Particle* p1, Particle* p2, float springConstant, float dampingConstant);
+    SpringDamper(Particle* p1, Particle* p2, float springConstant, float dampingConstant, float restLength);
     
     // compute and apply spring-damper forces
     void ComputeForce();

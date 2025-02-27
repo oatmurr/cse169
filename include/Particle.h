@@ -17,7 +17,7 @@ public:
     // apply a force to the particle
     void ApplyForce(glm::vec3 force);
 
-    // integrate the particle forward in time
+    // integrate the particle forward in time, also checks ground collision
     void Integrate(float dt);
 
     // getters and setters

@@ -8,12 +8,15 @@ Cloth::Cloth(int width, int height, float particleSpacing, float mass, float spr
     // initialise gravity
     gravity = glm::vec3(0.0f, -9.81f, 0.0f);
 
+    // initial height of cloth
+    float initialHeight = 2.0f;
+
     // create grid of particles
     for (int y = 0; y < width; y++) {
         for (int x = 0; x < height; x++) {
             
             // position particles in grid
-            glm::vec3 position = glm::vec3(x * particleSpacing, 0.0f, y * particleSpacing);
+            glm::vec3 position = glm::vec3(x * particleSpacing, initialHeight, y * particleSpacing);
 
             // create and store particles (fix top row of particles)
             if (y == 0) {
@@ -26,7 +29,7 @@ Cloth::Cloth(int width, int height, float particleSpacing, float mass, float spr
         }
     }
 
-    // create springs between particles
+    // create structural springs between particles
     for (int y = 0; y < width; y++) {
         for (int x = 0; x < height; x++) {
 
@@ -40,13 +43,13 @@ Cloth::Cloth(int width, int height, float particleSpacing, float mass, float spr
 
             // horizontal spring: p1 --- p2
             if (x < width - 1) {
-                SpringDamper* p1p2 = new SpringDamper(particles[i], particles[i + 1], springConstant, dampingConstant);
+                SpringDamper* p1p2 = new SpringDamper(particles[i], particles[i + 1], springConstant, dampingConstant, particleSpacing);
                 springs.push_back(p1p2);
             }
 
             // vertical spring: p1 --- p3
             if (y < height - 1) {
-                SpringDamper* p1p3 = new SpringDamper(particles[i], particles[i + width], springConstant, dampingConstant);
+                SpringDamper* p1p3 = new SpringDamper(particles[i], particles[i + width], springConstant, dampingConstant, particleSpacing);
                 springs.push_back(p1p3);
             }
 
@@ -54,12 +57,52 @@ Cloth::Cloth(int width, int height, float particleSpacing, float mass, float spr
             if (x < width - 1 && y < height - 1) {
                 
                 // p1 --- p4
-                SpringDamper* p1p4 = new SpringDamper(particles[i], particles[i + width + 1], springConstant, dampingConstant);
+                SpringDamper* p1p4 = new SpringDamper(particles[i], particles[i + width + 1], springConstant, dampingConstant, particleSpacing * sqrt(2.0f));
                 springs.push_back(p1p4);
 
                 // p2 --- p3
-                SpringDamper* p2p3 = new SpringDamper(particles[i + 1], particles[i + width], springConstant, dampingConstant);
+                SpringDamper* p2p3 = new SpringDamper(particles[i + 1], particles[i + width], springConstant, dampingConstant, particleSpacing * sqrt(2.0f));
                 springs.push_back(p2p3);
+            }
+        }
+    }
+
+    // create bending springs between particles (skip one particle)
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+
+            // particle index
+            int i = y * width + x;
+
+            // p1 --- p2 --- p3
+            // |      |      |
+            // |      |      |
+            // p4 --- p5 --- p6
+            // |      |      |
+            // |      |      |
+            // p7 --- p8 --- p9
+
+            // horizontal bending spring: p1 --- p3
+            if (x < width - 2) {
+                SpringDamper* p1p3 = new SpringDamper(particles[i], particles[i + 2], springConstant * 0.5f, dampingConstant * 1.5f, particleSpacing * 2.0f);
+                springs.push_back(p1p3);
+            }
+
+            // vertical bending spring: p1 --- p7
+            if (y < height - 2) {
+                SpringDamper* p1p7 = new SpringDamper(particles[i], particles[i + width * 2], springConstant * 0.5f, dampingConstant * 1.5f, particleSpacing * 2.0f);
+                springs.push_back(p1p7);
+            }
+
+            // diagonal bending springs: p1 --- p9, p3 --- p7
+            if (x < width - 2 && y < height - 2) {
+                // p1 --- p9
+                SpringDamper* p1p9 = new SpringDamper(particles[i], particles[i + width * 2 + 2], springConstant * 0.5f, dampingConstant * 1.5f, (particleSpacing * 2.0f) * sqrt(2.0f));
+                springs.push_back(p1p9);
+
+                // p3 --- p7
+                SpringDamper* p3p7 = new SpringDamper(particles[i + 2], particles[i + width * 2], springConstant * 0.5f, dampingConstant * 1.5f, (particleSpacing * 2.0f) * sqrt(2.0f));
+                springs.push_back(p3p7);
             }
         }
     }
@@ -76,12 +119,18 @@ Cloth::Cloth(int width, int height, float particleSpacing, float mass, float spr
             // |      |
             // p3 --- p4
 
+            // indices
+            int indexP1 = i;
+            int indexP2 = i + 1;
+            int indexP3 = i + width;
+            int indexP4 = i + width + 1;
+
             // p1, p2, p3
-            ClothTriangle* p1p2p3 = new ClothTriangle(particles[i], particles[i + 1], particles[i + width]);
+            ClothTriangle* p1p2p3 = new ClothTriangle(particles[i], particles[i + 1], particles[i + width], indexP1, indexP2, indexP3);
             triangles.push_back(p1p2p3);
 
             // p2, p3, p4
-            ClothTriangle* p2p3p4 = new ClothTriangle(particles[i + 1], particles[i + width], particles[i + width + 1]);
+            ClothTriangle* p2p3p4 = new ClothTriangle(particles[i + 1], particles[i + width], particles[i + width + 1], indexP2, indexP3, indexP4);
             triangles.push_back(p2p3p4);
         }
     }
@@ -113,6 +162,8 @@ Cloth::~Cloth() {
     glDeleteBuffers(1, &VBO_positions);
     glDeleteBuffers(1, &VBO_normals);
     glDeleteBuffers(1, &EBO);
+    glDeleteVertexArrays(1, &springVAO);
+    glDeleteBuffers(1, &springVBO);
 }
 
 void Cloth::SetWind(glm::vec3 wind) {
@@ -121,6 +172,8 @@ void Cloth::SetWind(glm::vec3 wind) {
 
 void Cloth::Simulate(float dt) {
     
+    // printf("Cloth::Simulate - dt = %f\n", dt);
+
     // apply gravity: F = m * g
     for (Particle* particle : particles) {
         particle->ApplyForce(gravity * particle->GetMass());
@@ -143,20 +196,6 @@ void Cloth::Simulate(float dt) {
 
     // after simulation is done, update buffers
     UpdateBuffers();
-
-        // Print positions of a few corner particles to check where the cloth is
-        if (!particles.empty()) {
-            std::cout << "First particle position: "
-                      << particles[0]->GetPosition().x << ", "
-                      << particles[0]->GetPosition().y << ", "
-                      << particles[0]->GetPosition().z << std::endl;
-                      
-            int lastIdx = particles.size() - 1;
-            std::cout << "Last particle position: "
-                      << particles[lastIdx]->GetPosition().x << ", "
-                      << particles[lastIdx]->GetPosition().y << ", "
-                      << particles[lastIdx]->GetPosition().z << std::endl;
-        }
 }
 
 void Cloth::Draw(glm::mat4 viewProjMtx, GLuint shader) {
@@ -167,67 +206,33 @@ void Cloth::Draw(glm::mat4 viewProjMtx, GLuint shader) {
     glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, (float*)&model);
     
     // triangles
-    glUniform3fv(glGetUniformLocation(shader, "DiffuseColor"), 1, &color[0]);
-    glBindVertexArray(VAO);
-    glDrawElements(GL_TRIANGLES, triangleIndices.size(), GL_UNSIGNED_INT, 0);
-    glBindVertexArray(0);
-    
-    // particles
-    glm::vec3 particleColor = glm::vec3(0.0f, 1.0f, 0.0f);
-    glUniform3fv(glGetUniformLocation(shader, "DiffuseColor"), 1, &particleColor[0]);
-    
-    // particles as points
-    glPointSize(8.0f);
-    
-    // setup point rendering
-    GLuint pointVAO, pointVBO;
-    glGenVertexArrays(1, &pointVAO);
-    glGenBuffers(1, &pointVBO);
-    
-    glBindVertexArray(pointVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, pointVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertexPositions.size(), vertexPositions.data(), GL_STATIC_DRAW);
-    
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    
-    // draw points
-    glDrawArrays(GL_POINTS, 0, vertexPositions.size());
-    
-    // clean up point VAO/VBO
-    glDeleteBuffers(1, &pointVBO);
-    glDeleteVertexArrays(1, &pointVAO);
+    // glUniform3fv(glGetUniformLocation(shader, "DiffuseColor"), 1, &color[0]);
+    // glBindVertexArray(VAO);
+    // glDrawElements(GL_TRIANGLES, triangleIndices.size(), GL_UNSIGNED_INT, 0);
+    // glBindVertexArray(0);
     
     // springs
     glm::vec3 springColor = glm::vec3(0.0f, 0.5f, 1.0f);
     glUniform3fv(glGetUniformLocation(shader, "DiffuseColor"), 1, &springColor[0]);
     
-    // setup line rendering for springs
-    std::vector<glm::vec3> springLines;
-    for (auto spring : springs) {
+    // line rendering for springs
+    springLines.clear();
+    for (SpringDamper* spring : springs) {
         springLines.push_back(spring->GetP1()->GetPosition());
         springLines.push_back(spring->GetP2()->GetPosition());
     }
     
-    // create VAO, VBO for springs
-    GLuint lineVAO, lineVBO;
-    glGenVertexArrays(1, &lineVAO);
-    glGenBuffers(1, &lineVBO);
-    
-    glBindVertexArray(lineVAO);
-    glBindBuffer(GL_ARRAY_BUFFER, lineVBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * springLines.size(), springLines.data(), GL_STATIC_DRAW);
+    // spring VAO/VBO
+    glBindVertexArray(springVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, springVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * springLines.size(), springLines.data(), GL_DYNAMIC_DRAW);
     
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     
-    // draw lines for springs
-    glLineWidth(1.5f); // Make lines a bit thicker
+    glLineWidth(1.5f);
     glDrawArrays(GL_LINES, 0, springLines.size());
-    
-    // clean up line VAO/VBO
-    glDeleteBuffers(1, &lineVBO);
-    glDeleteVertexArrays(1, &lineVAO);
+    glBindVertexArray(0);
     
     // reset point size and line width
     glPointSize(1.0f);
@@ -249,50 +254,14 @@ void Cloth::SetupBuffers() {
         vertexNormals.push_back(glm::vec3(0.0f));
     }
 
-    // for each triangle, store indices of vertices
+    // for each triangle, store indices of particles
     for (ClothTriangle* triangle : triangles) {
-        
-        // get the three particles for this triangle
-        Particle* a = triangle->GetP1();
-        Particle* b = triangle->GetP2();
-        Particle* c = triangle->GetP3();
-
-        // find index of a
-        int indexA = -1;
-        for (int i = 0; i < particles.size(); i++) {
-            if (particles[i] == a) {
-                indexA = i;
-                break;
-            }
-        }
-
-        // find index of b
-        int indexB = -1;
-        for (int i = 0; i < particles.size(); i++) {
-            if (particles[i] == b) {
-                indexB = i;
-                break;
-            }
-        }
-
-        // find index of c
-        int indexC = -1;
-        for (int i = 0; i < particles.size(); i++) {
-            if (particles[i] == c) {
-                indexC = i;
-                break;
-            }
-        }
-
-        // make sure all three particles were found and store indices in triangleIndices
-        if (indexA != -1 && indexB != -1 && indexC != -1) {
-            triangleIndices.push_back(indexA);
-            triangleIndices.push_back(indexB);
-            triangleIndices.push_back(indexC);
-        }
+        int indexP1 = triangle->GetIndexP1();
+        int indexP2 = triangle->GetIndexP2();
+        int indexP3 = triangle->GetIndexP3();
     }
 
-    // generate VAO and VBOs
+    // generate VAO and VBOs for triangles
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO_positions);
     glGenBuffers(1, &VBO_normals);
@@ -317,11 +286,13 @@ void Cloth::SetupBuffers() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * triangleIndices.size(), triangleIndices.data(), GL_DYNAMIC_DRAW);
 
+    // spring VAO/VBO
+    glGenVertexArrays(1, &springVAO);
+    glGenBuffers(1, &springVBO);
+
     // unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-
-    std::cout << "Set up " << triangleIndices.size() << " indices for drawing" << std::endl;
 }
 
 void Cloth::UpdateBuffers() {
@@ -339,48 +310,18 @@ void Cloth::UpdateBuffers() {
     // calculate normals by averaging triangle contributions
     for (ClothTriangle* triangle : triangles) {
 
-        // get the three particles for this triangle
-        Particle* a = triangle->GetP1();
-        Particle* b = triangle->GetP2();
-        Particle* c = triangle->GetP3();
+        // get triangle particle indices
+        int indexP1 = triangle->GetIndexP1();
+        int indexP2 = triangle->GetIndexP2();
+        int indexP3 = triangle->GetIndexP3();
 
-        // find index of a
-        int indexA = -1;
-        for (int i = 0; i < particles.size(); i++) {
-            if (particles[i] == a) {
-                indexA = i;
-                break;
-            }
-        }
+        // calculate triangle face normal
+        glm::vec3 normal = triangle->ComputeNormal();
 
-        // find index of b
-        int indexB = -1;
-        for (int i = 0; i < particles.size(); i++) {
-            if (particles[i] == b) {
-                indexB = i;
-                break;
-            }
-        }
-
-        // find index of c
-        int indexC = -1;
-        for (int i = 0; i < particles.size(); i++) {
-            if (particles[i] == c) {
-                indexC = i;
-                break;
-            }
-        }
-
-        if (indexA != -1 && indexB != -1 && indexC != -1) {
-
-            // calculate face normal
-            glm::vec3 normal = triangle->ComputeNormal();
-
-            // add to vertex normals
-            vertexNormals[indexA] += normal;
-            vertexNormals[indexB] += normal;
-            vertexNormals[indexC] += normal;
-        }
+        // add to vertex normals
+        vertexNormals[indexP1] += normal;
+        vertexNormals[indexP2] += normal;
+        vertexNormals[indexP3] += normal;
     }
 
     // normalise vertex normals

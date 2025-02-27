@@ -66,16 +66,16 @@ int main(int argc, char* argv[]) {
     if (argc > 1) {
         std::string filename = argv[1];
 
-        // #ifdef INCLUDE_CLOTH
+        #ifdef INCLUDE_CLOTH
         if (filename == "-cloth") {
             
             // default cloth
             int width = 20;
             int height = 20;
             float spacing = 0.2f;
-            float mass = 0.5f;
-            float springConstant = 50.0f;
-            float dampingConstant = 2.0f;
+            float mass = 1.0f;
+            float springConstant = 300.0f;
+            float dampingConstant = 15.0f;
 
             // parse additional parameters if provided
             if (argc > 2) width = std::stoi(argv[2]);
@@ -94,7 +94,7 @@ int main(int argc, char* argv[]) {
                 std::cout << "failed to create cloth!" << std::endl;
             }
         }
-        // #endif
+        #endif
 
         #ifdef INCLUDE_SKELETON
         // if there is a .skel file

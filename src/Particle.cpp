@@ -20,18 +20,26 @@ void Particle::Integrate(float dt) {
         // apply newton's second law (f = ma)
         glm::vec3 acceleration = force / mass;
 
-        // check for NaN or large values
-        if (glm::any(glm::isnan(acceleration)) || glm::length(acceleration) > 1000.0f) {
-            // reset to safe values
-            acceleration = glm::vec3(0.0f);
-            velocity = glm::vec3(0.0f);
-        }
-
-        // forward euler integration to get new velocity
+        // symplectic euler integration to get new velocity
         velocity += acceleration * dt;
 
-        // forward euler integration to get new position
+        // symplectic euler integration to get new position
         position += velocity * dt;
+
+        // ground collision
+        float groundHeight = 0.0f;
+        if (position.y < groundHeight) {
+
+            // push particle to surface
+            position.y = groundHeight;
+
+            // apply restitution (ε ≈ 0.05)
+            velocity.y *= -0.05f;
+
+            // apply friction (μ ≈ 0.5)
+            velocity.x *= 0.5f;
+            velocity.z *= 0.5f;
+        }
     }
 
     // zero force out so next frame will start fresh

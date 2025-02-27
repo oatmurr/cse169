@@ -16,9 +16,9 @@
 #include "AnimationPlayer.h"
 #endif
 
-// #ifdef INCLUDE_CLOTH
+#ifdef INCLUDE_CLOTH
 #include "Cloth.h"
-// #endif
+#endif
 
 // imgui stuff
 #include "imgui/imgui.h"
@@ -49,12 +49,12 @@ public:
     static AnimationPlayer* player;
     #endif
 
-    // #ifdef INCLUDE_CLOTH
+    #ifdef INCLUDE_CLOTH
     static Cloth* cloth;
     static glm::vec3 wind;
     static bool pauseSimulation;
     static void RenderClothControls();
-    // #endif
+    #endif
 
     // Shader Program
     static GLuint shaderProgram;

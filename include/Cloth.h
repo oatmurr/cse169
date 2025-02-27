@@ -25,6 +25,10 @@ private:
     glm::mat4 model;
     glm::vec3 color;
 
+    // persistent rendering
+    GLuint springVAO, springVBO;
+    std::vector<glm::vec3> springLines;
+
 public:
     Cloth(int width, int height, float particleSpacing, float mass, float springConstant, float dampingConstant);
     ~Cloth();

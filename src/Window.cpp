@@ -50,11 +50,11 @@ static Joint* selectedJoint = nullptr;
 static int currentJointIndex = 0;
 #endif
 
-// #ifdef INCLUDE_CLOTH
+#ifdef INCLUDE_CLOTH
 Cloth* Window::cloth;
 glm::vec3 Window::wind = glm::vec3(0.0f, 0.0f, 0.0f);
 bool Window::pauseSimulation = false;
-// #endif
+#endif
 
 // Constructors and desctructors
 // bool Window::initializeProgram() {
@@ -83,10 +83,10 @@ bool Window::initializeProgram(GLFWwindow* window) {
         return false;
     }
 
-    // #ifdef INCLUDE_CLOTH
+    #ifdef INCLUDE_CLOTH
     wind = glm::vec3(0.0f, 0.0f, 0.0f);
     pauseSimulation = false;
-    // #endif
+    #endif
 
     return true;
 }
@@ -122,9 +122,9 @@ bool Window::initializeObjects() {
     player->SetRig(rig);
     #endif
 
-    // #ifdef INCLUDE_CLOTH
+    #ifdef INCLUDE_CLOTH
     cloth = nullptr;
-    // #endif
+    #endif
 
     return true;
 }
@@ -147,9 +147,9 @@ void Window::cleanUp() {
     delete player;
     #endif
 
-    // #ifdef INCLUDE_CLOTH
+    #ifdef INCLUDE_CLOTH
     delete cloth;
-    // #endif
+    #endif
 
     // Delete the shader program.
     glDeleteProgram(shaderProgram);
@@ -274,12 +274,12 @@ void Window::idleCallback() {
         #endif
     #endif
 
-    // #ifdef INCLUDE_CLOTH
+    #ifdef INCLUDE_CLOTH
     if (cloth && !pauseSimulation) {
         cloth->SetWind(wind);
         cloth->Simulate(deltaTime);
     }
-    // #endif
+    #endif
 }
 
 void Window::displayCallback(GLFWwindow* window) {
@@ -314,21 +314,17 @@ void Window::displayCallback(GLFWwindow* window) {
     ImGui::End();
     #endif
 
-    // #ifdef INCLUDE_CLOTH
+    #ifdef INCLUDE_CLOTH
     if (cloth) {
-        std::cout << "About to draw cloth..." << std::endl;
         cloth->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
-        std::cout << "Finished drawing cloth" << std::endl;
-
-        
     }
-    // #endif
+    #endif
 
-    // #ifdef INCLUDE_CLOTH
+    #ifdef INCLUDE_CLOTH
     ImGui::Begin("cloth");
     RenderClothControls();
     ImGui::End();
-    // #endif
+    #endif
 
     ImGui::ShowDemoWindow();
 
@@ -485,13 +481,13 @@ void Window::RenderJointControls() {
 }
 #endif
 
-// #ifdef INCLUDE_CLOTH
+#ifdef INCLUDE_CLOTH
 void Window::RenderClothControls() {
 
     ImGui::Text("wind");
-    ImGui::SliderFloat("wind-x", &wind.x, -10.0f, 10.0f);
-    ImGui::SliderFloat("wind-y", &wind.y, -10.0f, 10.0f);
-    ImGui::SliderFloat("wind-z", &wind.z, -10.0f, 10.0f);
+    ImGui::SliderFloat("wind-x", &wind.x, -0.1f, 0.1f);
+    ImGui::SliderFloat("wind-y", &wind.y, -0.1f, 0.1f);
+    ImGui::SliderFloat("wind-z", &wind.z, -0.1f, 0.1f);
 
     if (ImGui::Button("reset wind")) {
         wind = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -501,4 +497,4 @@ void Window::RenderClothControls() {
 
     ImGui::Checkbox("pause simulation", &pauseSimulation);
 }
-// #endif
+#endif

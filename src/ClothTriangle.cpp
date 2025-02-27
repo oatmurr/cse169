@@ -1,11 +1,14 @@
 #include "ClothTriangle.h"
 
-ClothTriangle::ClothTriangle(Particle* p1, Particle* p2, Particle* p3, float dragCoefficient, float fluidDensity) {
+ClothTriangle::ClothTriangle(Particle* p1, Particle* p2, Particle* p3, int indexP1, int indexP2, int indexP3) {
     this->p1 = p1;
     this->p2 = p2;
     this->p3 = p3;
-    this->dragCoefficient = dragCoefficient;
-    this->fluidDensity = fluidDensity;
+    this->indexP1 = indexP1;
+    this->indexP2 = indexP2;
+    this->indexP3 = indexP3;
+    dragCoefficient = 1.28;
+    fluidDensity = 1.225;
 }
 
 void ClothTriangle::ComputeAerodynamicForce(glm::vec3 wind) {
@@ -24,14 +27,10 @@ void ClothTriangle::ComputeAerodynamicForce(glm::vec3 wind) {
     // area (a0) of triangle
     float area = 0.5f * glm::length(glm::cross(p2->GetPosition() - p1->GetPosition(), p3->GetPosition() - p1->GetPosition()));
 
-    // degenerate triangle
-    if (area < 0.0001f) {
-        std::cout << "ClothTriangle::ComputeAerodynamicForce: current length is zero" << std::endl;
-        return;
-    }
-
-    // cross-sectional area (a) which is the area viewed from the direction of the airflow
-    float crossSectionalArea = area * glm::dot(glm::normalize(velocity), normal);
+    // cross-sectional area (a) which is the area viewed from the direction of the airflow (clamp to 0 if negative)
+    float cosTheta = glm::dot(glm::normalize(velocity), normal);
+    cosTheta = glm::max(0.0f, cosTheta);
+    float crossSectionalArea = area * cosTheta;
 
     // aerodynamic force
     glm::vec3 aerodynamicForce = (-1.0f/2.0f) * fluidDensity * speed * speed * dragCoefficient * crossSectionalArea * normal;
@@ -52,6 +51,18 @@ Particle* ClothTriangle::GetP2() {
 
 Particle* ClothTriangle::GetP3() {
     return p3;
+}
+
+int ClothTriangle::GetIndexP1() {
+    return indexP1;
+}
+
+int ClothTriangle::GetIndexP2() {
+    return indexP2;
+}
+
+int ClothTriangle::GetIndexP3() {
+    return indexP3;
 }
 
 glm::vec3 ClothTriangle::ComputeNormal() {
