@@ -38,3 +38,15 @@ glm::vec3 Particle::GetPosition() {
 glm::vec3 Particle::GetVelocity() {
     return velocity;
 }
+
+float Particle::GetMass() {
+    return mass;
+}
+
+void Particle::SetPosition(glm::vec3 position) {
+    this->position = position;
+}
+
+void Particle::SetVelocity(glm::vec3 velocity) {
+    this->velocity = velocity;
+}

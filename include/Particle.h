@@ -19,7 +19,10 @@ public:
     // integrate the particle forward in time
     void Integrate(float dt);
 
-    // getters
+    // getters and setters
     glm::vec3 GetPosition();
     glm::vec3 GetVelocity();
+    float GetMass();
+    void SetPosition(glm::vec3 position);
+    void SetVelocity(glm::vec3 velocity);
 };
