@@ -107,7 +107,7 @@ int main(int argc, char* argv[]) {
             if (argc > 2 && Window::skin) {
                 Window::skin->Load(argv[2], Window::skeleton);
 
-                #ifdef INCLUDE_ANIMMATION
+                #ifdef INCLUDE_ANIMATION
                 // if there is a .skel file, a .skin file, and a .anim file
                 if (argc > 3 && Window::clip) {
                     Window::clip->Load(argv[3]);

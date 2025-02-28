@@ -175,6 +175,7 @@ void Cloth::Simulate(float dt) {
     // float subdt = dt / 10.0f;
 
     // for (int i = 0; i < 10; i++) {
+    //     // apply gravity
     //     for (Particle* particle : particles) {
     //         particle->ApplyForce(gravity * particle->GetMass());
     //     }
