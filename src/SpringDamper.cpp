@@ -12,21 +12,24 @@ void SpringDamper::ComputeForce() {
     // compute current length (l) and unit vector (e)
     glm::vec3 distance = p2->GetPosition() - p1->GetPosition();
     float currentLength = glm::length(distance);
+
     glm::vec3 unitVector = distance / currentLength;
 
     // compute closing velocity (vclose)
-    float closingVelocity = glm::dot(p2->GetVelocity() - p1->GetVelocity(), unitVector);
+    float closingVelocity = glm::dot(p1->GetVelocity() - p2->GetVelocity(), unitVector);
 
-    // -ks(l0 - l)
-    glm::vec3 springForce = -springConstant * (currentLength - restLength) * unitVector;
+    // -ks * (l0 - l)
+    float springForce = -springConstant * (restLength - currentLength);
+    // printf("spring force: %f\n", springForce);
     // -kd * vclose
-    glm::vec3 dampingForce = -dampingConstant * closingVelocity * unitVector;
+    float dampingForce = -dampingConstant * closingVelocity;
+    // printf("damping force: %f\n", dampingForce);
 
     // apply force f1 = fe
-    p1->ApplyForce(springForce + dampingForce);
+    p1->ApplyForce((springForce + dampingForce) * unitVector);
 
     // apply force f2 = -f1
-    p2->ApplyForce(-springForce - dampingForce);
+    p2->ApplyForce((-springForce - dampingForce) * unitVector);
 }
 
 Particle* SpringDamper::GetP1() {

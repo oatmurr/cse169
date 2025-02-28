@@ -277,7 +277,7 @@ void Window::idleCallback() {
     #ifdef INCLUDE_CLOTH
     if (cloth && !pauseSimulation) {
         cloth->SetWind(wind);
-        cloth->Simulate(deltaTime);
+        cloth->Simulate(0.002);
     }
     #endif
 }
@@ -519,9 +519,13 @@ void Window::RenderJointControls() {
 void Window::RenderClothControls() {
 
     ImGui::Text("wind");
-    ImGui::SliderFloat("wind-x", &wind.x, -0.1f, 0.1f);
-    ImGui::SliderFloat("wind-y", &wind.y, -0.1f, 0.1f);
-    ImGui::SliderFloat("wind-z", &wind.z, -0.1f, 0.1f);
+    // ImGui::SliderFloat("wind-x", &wind.x, -10.0f, 10.0f);
+    // ImGui::SliderFloat("wind-y", &wind.y, -10.0f, 10.0f);
+    // ImGui::SliderFloat("wind-z", &wind.z, -10.0f, 10.0f);
+
+    ImGui::InputFloat("wind-x", &wind.x);
+    ImGui::InputFloat("wind-y", &wind.y);
+    ImGui::InputFloat("wind-z", &wind.z);
 
     if (ImGui::Button("reset wind")) {
         wind = glm::vec3(0.0f, 0.0f, 0.0f);

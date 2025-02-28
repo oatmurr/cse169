@@ -172,6 +172,29 @@ void Cloth::SetWind(glm::vec3 wind) {
 
 void Cloth::Simulate(float dt) {
     
+    // float subdt = dt / 10.0f;
+
+    // for (int i = 0; i < 10; i++) {
+    //     for (Particle* particle : particles) {
+    //         particle->ApplyForce(gravity * particle->GetMass());
+    //     }
+    
+    //     // compute and apply spring-damper forces
+    //     for (SpringDamper* spring : springs) {
+    //         spring->ComputeForce();
+    //     }
+    
+    //     // compute and apply aerodynamic forces using wind
+    //     for (ClothTriangle* triangle : triangles) {
+    //         triangle->ComputeAerodynamicForce(wind);
+    //     }
+    
+    //     // update particle positions by integrating forces
+    //     for (Particle* particle : particles) {
+    //         particle->Integrate(subdt);
+    //     }
+    // }
+
     // printf("Cloth::Simulate - dt = %f\n", dt);
 
     // apply gravity: F = m * g
