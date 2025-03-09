@@ -1,11 +1,29 @@
 #include "ParticleSystem.h"
 
-ParticleSystem::ParticleSystem(int n, std::vector<glm::vec3> cubePos) {
-    size = n;
-    positions = cubePos;
+ParticleSystem::ParticleSystem(int size, glm::vec3 color, float smoothingRadius, float particleMass, float restDensity, float viscosity, float gasConstant, glm::vec3 gravity, float boundaryStiffness, float boundaryDamping, glm::vec3 boxMin, glm::vec3 boxMax) {
+    this->size = size;
+    this->particles = std::vector<Particle*>(size);
+
+    this->color = color;
+
+    this->smoothingRadius = smoothingRadius;
+    this->particleMass = particleMass;
+    this->restDensity = restDensity;
+    this->viscosity = viscosity;
+    this->gasConstant = gasConstant;
+    this->gravity = gravity;
+
+    this->boundaryStiffness = boundaryStiffness;
+    this->boundaryDamping = boundaryDamping;
+    this->boxMin = boxMin;
+    this->boxMax = boxMax;
 }
 
 ParticleSystem::~ParticleSystem() {
+    for (Particle* p : particles) {
+        delete p;
+    }
+    
     // Delete the VBOs and the VAO.
     glDeleteBuffers(1, &VBO);
     glDeleteVertexArrays(1, &VAO);
@@ -18,9 +36,9 @@ void ParticleSystem::draw(const glm::mat4& viewProjMtx, GLuint shader) {
     // Bind to the VAO.
     glBindVertexArray(VAO);
 
-    // // Bind to VBO
+    // Bind to VBO
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(glm::vec3), positions.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, particles.size() * sizeof(glm::vec3), particles.data(), GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 
@@ -37,7 +55,7 @@ void ParticleSystem::draw(const glm::mat4& viewProjMtx, GLuint shader) {
 
     // draw points
     glBindVertexArray(VAO);
-    glDrawArrays(GL_POINTS, 0, positions.size());
+    glDrawArrays(GL_POINTS, 0, particles.size());
     glBindVertexArray(0);
 
     // Unbind the VAO and shader program
@@ -45,11 +63,6 @@ void ParticleSystem::draw(const glm::mat4& viewProjMtx, GLuint shader) {
     glUseProgram(0);
 }
 
-void ParticleSystem::update(glm::mat3 spinMat) {
-    spin(0.05f);
-}
+void ParticleSystem::update() {
 
-void ParticleSystem::spin(float deg) {
-    // Update the model matrix by multiplying a rotation matrix
-    model = model * glm::rotate(glm::radians(deg), glm::vec3(0.0f, 1.0f, 0.0f));
 }

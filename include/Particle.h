@@ -27,8 +27,19 @@ public:
     // getters and setters
     glm::vec3 GetPosition();
     glm::vec3 GetVelocity();
+    glm::vec3 GetForce();
     float GetMass();
-    bool IsFixed();
+    float GetDensity();
+    float GetPressure();
+
     void SetPosition(glm::vec3 position);
     void SetVelocity(glm::vec3 velocity);
+    void SetForce(glm::vec3 force);
+    void SetMass(float mass);
+    void SetDensity(float density);
+    void SetPressure(float pressure);
+
+
+    bool IsFixed();
+
 };

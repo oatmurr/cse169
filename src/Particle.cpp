@@ -54,12 +54,20 @@ glm::vec3 Particle::GetVelocity() {
     return velocity;
 }
 
+glm::vec3 Particle::GetForce() {
+    return force;
+}
+
 float Particle::GetMass() {
     return mass;
 }
 
-bool Particle::IsFixed() {
-    return fixed;
+float Particle::GetDensity() {
+    return density;
+}
+
+float Particle::GetPressure() {
+    return pressure;
 }
 
 void Particle::SetPosition(glm::vec3 position) {
@@ -68,4 +76,24 @@ void Particle::SetPosition(glm::vec3 position) {
 
 void Particle::SetVelocity(glm::vec3 velocity) {
     this->velocity = velocity;
+}
+
+void Particle::SetForce(glm::vec3 force) {
+    this->force = force;
+}
+
+void Particle::SetMass(float mass) {
+    this->mass = mass;
+}
+
+void Particle::SetDensity(float density) {
+    this->density = density;
+}
+
+void Particle::SetPressure(float pressure) {
+    this->pressure = pressure;
+}
+
+bool Particle::IsFixed() {
+    return fixed;
 }
