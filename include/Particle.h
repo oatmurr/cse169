@@ -11,6 +11,10 @@ private:
     float mass;
     bool fixed;
 
+    // for SPH
+    float density;
+    float pressure;
+
 public:
     Particle(glm::vec3 position, float mass, bool fixed = false);
 

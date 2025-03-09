@@ -24,9 +24,12 @@ void setup_callbacks(GLFWwindow* window) {
 void setup_opengl_settings() {
     // Enable depth buffering.
     glEnable(GL_DEPTH_TEST);
+    // such that we can choose particle size
+    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
     // Related to shaders and z value comparisons for the depth buffer.
     glDepthFunc(GL_LEQUAL);
     // Set polygon drawing mode to fill front and back of each polygon.
+    // for different choices for these 2 param, see https://registry.khronos.org/OpenGL-Refpages/gl4/html/glPolygonMode.xhtml
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     // Set clear color to black.
     glClearColor(0.0, 0.0, 0.0, 0.0);
