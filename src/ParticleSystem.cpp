@@ -85,10 +85,10 @@ void ParticleSystem::computeDensityPressure()
         // reset density
         float density = 0.0f;
 
-        // sum up contributions from other particles
+        // sum up contributions from all other particles (neighbor search not implemented yet)
         // kernel function: W_ij = W((‖x_i - x_j‖)/(h)) = W(q) = (1/(h^d)) * f(q)
         for (Particle* pj : particles)
-        {   
+        {               
             // distance betwen particles: x_i - x_j
             glm::vec3 r_ij = pj->GetPosition() - pi->GetPosition();
 
@@ -101,17 +101,21 @@ void ParticleSystem::computeDensityPressure()
                 // normalisation factor: 1/(h^d)
                 float normalisationFactor = 1.0f / (smoothingRadius * smoothingRadius * smoothingRadius);
                 
-                // (1/(h^d)) * f(q)
-                density += mass * normalisationFactor * kernelFunction(r, smoothingRadius);
+                // ----- DENSITY -----
+                // W_ij = W(r, h) = (1/(h^d)) * f(q)
+                float kernelW = normalisationFactor * kernelFunction(r, smoothingRadius);
+                // density = ∑(m_j * W)
+                density += mass * kernelW;
             }
         }
 
         pi->SetDensity(density);
 
+        // ----- PRESSURE -----
         // tait equation of state for water (γ = 7): pi = k[(ρ/ρ₀)^γ - 1]
         // from section 1.3 of "SPH Fluids in Computer Graphics" by Ihmsen et al. 2014
         float pressure = gasConstant * (pow(density / restDensity, 7.0f) - 1.0f);
-        
+
         pi->SetPressure(pressure);
 
         // ensure pressure is not negative
@@ -125,7 +129,53 @@ void ParticleSystem::computeDensityPressure()
 
 void ParticleSystem::computeForces()
 {
+    // compute forces for each particle (pressure, viscosity, gravity)
+    for (Particle* pi : particles)
+    {
+        glm::vec3 pressureForce = glm::vec3(0.0f);
+        glm::vec3 viscosityForce = glm::vec3(0.0f);
+        // ----- GRAVITY FORCE -----
+        glm::vec3 gravityForce = mass * gravity;
+        
+        // sum up contributions from all other particles (neighbor search not implemented yet)
+        // kernel function: W_ij = W((‖x_i - x_j‖)/(h)) = W(q) = (1/(h^d)) * f(q)
+        for (Particle* pj : particles)
+        {
+            if (pi == pj)
+            {
+                continue;
+            }
 
+            // distance betwen particles: x_i - x_j
+            glm::vec3 r_ij = pj->GetPosition() - pi->GetPosition();
+
+            // magnitude of r_ij: ‖x_i - x_j‖
+            float r = glm::length(r_ij);
+
+            if (r < smoothingRadius && r > 0.0001f)
+            {
+                // normalisation factor: 1/(h^d)
+                float normalisationFactor = 1.0f / (smoothingRadius * smoothingRadius * smoothingRadius);
+
+                // ----- PRESSURE FORCE -----
+                // W_ij = ∇W(r, h) = (1/(h^d)) * f(q)
+                glm::vec3 gradientW = normalisationFactor * kernelGradient(r_ij, smoothingRadius);
+                // F_pressure = -m * (p_i/ρ_i² + p_j/ρ_j²) * ∇W
+                pressureForce += -mass * (pi->GetPressure() / (pi->GetDensity() * pi->GetDensity()) + 
+                                          pj->GetPressure() / (pj->GetDensity() * pj->GetDensity())) * gradientW;
+
+                // ----- VISCOSITY FORCE -----
+                // W_ij = ∇^2W(r, h) = (1/(h^d)) * f(q)
+                float laplacianW = normalisationFactor * kernelLaplacian(r, smoothingRadius);
+                // F_viscosity = μ * m * (v_j - v_i)/ρ_j * ∇²W
+                viscosityForce += viscosity * mass * (pj->GetVelocity() - pi->GetVelocity()) / pj->GetDensity() * laplacianW;
+            }
+        }
+
+        glm::vec3 totalForce = pressureForce + viscosityForce + gravityForce;
+
+        pi->ApplyForce(totalForce);
+    }
 }
 
 void ParticleSystem::integrate(float dt)
