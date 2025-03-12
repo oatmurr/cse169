@@ -2,12 +2,14 @@
 #include "core.h"
 #include <iostream>
 
-void error_callback(int error, const char* description) {
+void error_callback(int error, const char* description)
+{
     // Print error.
     std::cerr << description << std::endl;
 }
 
-void setup_callbacks(GLFWwindow* window) {
+void setup_callbacks(GLFWwindow* window)
+{
     // Set the error callback.
     glfwSetErrorCallback(error_callback);
     // Set the window resize callback.
@@ -21,7 +23,8 @@ void setup_callbacks(GLFWwindow* window) {
     glfwSetCursorPosCallback(window, Window::cursor_callback);
 }
 
-void setup_opengl_settings() {
+void setup_opengl_settings()
+{
     // Enable depth buffering.
     glEnable(GL_DEPTH_TEST);
     // such that we can choose particle size
@@ -35,7 +38,8 @@ void setup_opengl_settings() {
     glClearColor(0.0, 0.0, 0.0, 0.0);
 }
 
-void print_versions() {
+void print_versions()
+{
     // Get info of GPU and supported OpenGL version.
     std::cout << "Renderer: " << glGetString(GL_RENDERER) << std::endl;
     std::cout << "OpenGL version supported: " << glGetString(GL_VERSION)
@@ -47,7 +51,8 @@ void print_versions() {
 #endif
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv[])
+{
     // Create the GLFW window.
     GLFWwindow* window = Window::createWindow(800, 600);
     if (!window) exit(EXIT_FAILURE);
@@ -66,12 +71,13 @@ int main(int argc, char* argv[]) {
     if (!Window::initializeObjects()) exit(EXIT_FAILURE);
 
     // command line stuff
-    if (argc > 1) {
+    if (argc > 1)
+    {
         std::string filename = argv[1];
 
         #ifdef INCLUDE_CLOTH
-        if (filename == "-cloth") {
-            
+        if (filename == "-cloth")
+        {
             // default cloth
             int width = 20;
             int height = 20;
@@ -91,9 +97,12 @@ int main(int argc, char* argv[]) {
             // create cloth
             Window::cloth = new Cloth(width, height, spacing, mass, springConstant, dampingConstant);
             
-            if (Window::cloth) {
+            if (Window::cloth)
+            {
                 std::cout << "cloth created with dimensions: " << width << "x" << height << std::endl;
-            } else {
+            }
+            else
+            {
                 std::cout << "failed to create cloth!" << std::endl;
             }
         }
@@ -101,18 +110,21 @@ int main(int argc, char* argv[]) {
 
         #ifdef INCLUDE_SKELETON
         // if there is a .skel file
-        if ((filename.find(".skel") != std::string::npos) && Window::skeleton) {
+        if ((filename.find(".skel") != std::string::npos) && Window::skeleton)
+        {
             Window::skeleton->Load(argv[1]);
             Window::skeleton->PopulateJointList();
 
             #ifdef INCLUDE_SKIN
             // if there is a .skel file and a .skin file
-            if (argc > 2 && Window::skin) {
+            if (argc > 2 && Window::skin)
+            {
                 Window::skin->Load(argv[2], Window::skeleton);
 
                 #ifdef INCLUDE_ANIMATION
                 // if there is a .skel file, a .skin file, and a .anim file
-                if (argc > 3 && Window::clip) {
+                if (argc > 3 && Window::clip)
+                {
                     Window::clip->Load(argv[3]);
                 }
                 #endif
@@ -123,14 +135,16 @@ int main(int argc, char* argv[]) {
 
         #ifdef INCLUDE_SKIN
         // if there is a .skin file but no .skel file
-        if ((filename.find(".skin") != std::string::npos) && Window::skin) {
+        if ((filename.find(".skin") != std::string::npos) && Window::skin)
+        {
             Window::skin->Load(argv[1], nullptr);
         }
         #endif
     }
 
     // Loop while GLFW window should stay open.
-    while (!glfwWindowShouldClose(window)) {
+    while (!glfwWindowShouldClose(window))
+    {
         // Main render display callback. Rendering of objects is done here.
         Window::displayCallback(window);
 

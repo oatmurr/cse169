@@ -1,27 +1,32 @@
 #include "Rig.h"
 
-Rig::Rig() {
+Rig::Rig()
+{
     skeleton = nullptr;
     skin = nullptr;
 }
 
-Rig::Rig(Skeleton* skeleton, Skin* skin) {
+Rig::Rig(Skeleton* skeleton, Skin* skin)
+{
     this->skeleton = skeleton;
     this->skin = skin;
 }
 
-Rig::~Rig() {
+Rig::~Rig()
+{
     delete skeleton;
     delete skin;
 }
 
-Skeleton* Rig::GetSkeleton() {
+Skeleton* Rig::GetSkeleton()
+{
     return skeleton;
 }
 
-void Rig::ApplyPose(Pose& pose) {
-    
-    if (!skeleton) {
+void Rig::ApplyPose(Pose& pose)
+{
+    if (!skeleton)
+    {
         printf("Rig::ApplyPose - skeleton is null\n");
         return;
     }
@@ -34,13 +39,15 @@ void Rig::ApplyPose(Pose& pose) {
     float rootTranslationZ = pose.GetDOF(2).GetValue();
 
     // set root translation
-    if (jointList.size() > 0) {
+    if (jointList.size() > 0)
+    {
         jointList[0]->SetOffset(rootTranslationX, rootTranslationY, rootTranslationZ);
     }
 
-    for (int i = 0; i < jointList.size(); i++) {
-        
-        if (!jointList[i]) {
+    for (int i = 0; i < jointList.size(); i++)
+    {
+        if (!jointList[i])
+        {
             printf("Rig::ApplyPose - jointList[%d] is null\n", i);
             continue;
         }
@@ -57,7 +64,8 @@ void Rig::ApplyPose(Pose& pose) {
     }
 
     skeleton->Update();
-    if (skin) {
+    if (skin)
+    {
         skin->Update();
     }
 }

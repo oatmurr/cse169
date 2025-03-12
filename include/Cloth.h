@@ -4,7 +4,8 @@
 #include <vector>
 #include <iostream>
 
-class Cloth {
+class Cloth
+{
 private:
     std::vector<Particle*> particles;
     std::vector<SpringDamper*> springs;

@@ -1,6 +1,7 @@
 #include "SpringDamper.h"
 
-SpringDamper::SpringDamper(Particle* p1, Particle* p2, float springConstant, float dampingConstant, float restLength) {
+SpringDamper::SpringDamper(Particle* p1, Particle* p2, float springConstant, float dampingConstant, float restLength)
+{
     this->p1 = p1;
     this->p2 = p2;
     this->springConstant = springConstant;
@@ -8,7 +9,8 @@ SpringDamper::SpringDamper(Particle* p1, Particle* p2, float springConstant, flo
     this->restLength = restLength;
 }
 
-void SpringDamper::ComputeForce() {
+void SpringDamper::ComputeForce()
+{
     // compute current length (l) and unit vector (e)
     glm::vec3 distance = p2->GetPosition() - p1->GetPosition();
     float currentLength = glm::length(distance);
@@ -32,10 +34,12 @@ void SpringDamper::ComputeForce() {
     p2->ApplyForce((-springForce - dampingForce) * unitVector);
 }
 
-Particle* SpringDamper::GetP1() {
+Particle* SpringDamper::GetP1()
+{
     return p1;
 }
 
-Particle* SpringDamper::GetP2() {
+Particle* SpringDamper::GetP2()
+{
     return p2;
 }

@@ -1,6 +1,7 @@
 #include "Vertex.h"
 
-Vertex::Vertex() {
+Vertex::Vertex()
+{
     this->position = glm::vec3(0.0f, 0.0f, 0.0f);
     this->normal = glm::vec3(0.0f, 0.0f, 0.0f);
 
@@ -13,13 +14,15 @@ Vertex::Vertex() {
 
     this->numAttachments = 0;
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++)
+    {
         this->jointIndices[i] = 0;
         this->weights[i] = 0;
     }
 }   
 
-Vertex::Vertex(glm::vec3 position, glm::vec3 normal, int numAttachments, const std::vector<int>& jointIndices, const std::vector<float>& weights) {
+Vertex::Vertex(glm::vec3 position, glm::vec3 normal, int numAttachments, const std::vector<int>& jointIndices, const std::vector<float>& weights)
+{
     this->position = position;
     this->normal = normal;
 
@@ -34,9 +37,12 @@ Vertex::Vertex(glm::vec3 position, glm::vec3 normal, int numAttachments, const s
     glm::vec3 normalCrossZ = glm::cross(normal, glm::vec3(0.0f, 0.0f, 1.0f));
 
     // choose the cross product that gives the longest vector (most perpendicular) and normalise
-    if (glm::length(normalCrossZ) > glm::length(normalCrossY)) {
+    if (glm::length(normalCrossZ) > glm::length(normalCrossY))
+    {
         this->tangent = glm::normalize(normalCrossZ);
-    } else {
+    }
+    else
+    {
         this->tangent = glm::normalize(normalCrossY);
     }
 
@@ -45,7 +51,8 @@ Vertex::Vertex(glm::vec3 position, glm::vec3 normal, int numAttachments, const s
 
     this->numAttachments = numAttachments;
 
-    for (int i = 0; i < numAttachments; i++) {
+    for (int i = 0; i < numAttachments; i++)
+    {
         // cast as uint8_t
         // this->jointIndices[i] = uint8_t(jointIndices[i]);
         this->jointIndices[i] = uint16_t(jointIndices[i]);
@@ -54,14 +61,17 @@ Vertex::Vertex(glm::vec3 position, glm::vec3 normal, int numAttachments, const s
     }
 }
 
-int Vertex::GetNumAttachments() {
+int Vertex::GetNumAttachments()
+{
     return this->numAttachments;
 }
 
-float Vertex::GetWeight(int index) {
+float Vertex::GetWeight(int index)
+{
     return this->weights[index] / 255.0f;
 }
 
-int Vertex::GetJointIndex(int index) {
+int Vertex::GetJointIndex(int index)
+{
     return this->jointIndices[index];
 }

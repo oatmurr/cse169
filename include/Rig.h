@@ -3,8 +3,8 @@
 #include "Skin.h"
 #include "Pose.h"
 
-class Rig {
-
+class Rig
+{
 private:
     Skeleton* skeleton;
     Skin* skin;

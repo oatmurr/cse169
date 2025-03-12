@@ -4,10 +4,12 @@
 
 #include "Camera.h"
 
-Camera::Camera() {
+Camera::Camera()
+{
     Reset();
 }
-void Camera::Update() {
+void Camera::Update()
+{
     // Compute camera world matrix
     glm::mat4 world(1);
     world[3][2] = Distance;
@@ -22,7 +24,8 @@ void Camera::Update() {
     // Compute final view-projection matrix
     ViewProjectMtx = project * view;
 }
-void Camera::Reset() {
+void Camera::Reset()
+{
     FOV = 45.0f;
     Aspect = 1.33f;
     NearClip = 0.1f;

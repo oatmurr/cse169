@@ -2,7 +2,8 @@
 
 #include "Joint.h"
 
-class Skeleton {
+class Skeleton
+{
 private:
     // joint tree
     Joint* root;

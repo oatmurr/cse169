@@ -11,7 +11,8 @@
 // be extended to support more interactive controls. Ultimately. the camera sets the
 // GL projection and viewing matrices.
 
-class Camera {
+class Camera
+{
 public:
     Camera();
 

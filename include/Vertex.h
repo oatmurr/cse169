@@ -3,7 +3,8 @@
 #include "core.h"
 #include <vector>
 
-class Vertex {
+class Vertex
+{
 private:    
     // Rendering data (position, normal, color, texture coordinates, tangents...)
     

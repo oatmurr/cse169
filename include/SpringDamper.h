@@ -2,7 +2,8 @@
 
 #include "Particle.h"
 
-class SpringDamper {
+class SpringDamper
+{
 private:
     // stiffness
     float springConstant;

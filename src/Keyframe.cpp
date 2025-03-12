@@ -1,6 +1,7 @@
 #include  "Keyframe.h"
 
-Keyframe::Keyframe() {
+Keyframe::Keyframe() 
+{
     time = 0.0f;
     value = 0.0f;
     tangentIn = 0.0f;
@@ -9,40 +10,48 @@ Keyframe::Keyframe() {
     ruleOut = "fixed";
 }
 
-float Keyframe::GetTime() const {
+float Keyframe::GetTime() const 
+{
     return time;
 }
 
-float Keyframe::GetValue() const {
+float Keyframe::GetValue() const 
+{
     return value;
 }
 
-float Keyframe::GetTangentIn() const {
+float Keyframe::GetTangentIn() const 
+{
     return tangentIn;
 }
 
-float Keyframe::GetTangentOut() const {
+float Keyframe::GetTangentOut() const 
+{
     return tangentOut;
 }
 
-std::string Keyframe::GetRuleIn() const {
+std::string Keyframe::GetRuleIn() const 
+{
     return ruleIn;
 }
 
-std::string Keyframe::GetRuleOut() const {
+std::string Keyframe::GetRuleOut() const 
+{
     return ruleOut;
 }
 
-void Keyframe::SetTangentIn(float tangent) {
+void Keyframe::SetTangentIn(float tangent) 
+{
     tangentIn = tangent;
 }
 
-void Keyframe::SetTangentOut(float tangent) {
+void Keyframe::SetTangentOut(float tangent) 
+{
     tangentOut = tangent;
 }
 
-bool Keyframe::Load(Tokenizer& token) {
-    
+bool Keyframe::Load(Tokenizer& token) 
+{
     // load time
     time = token.GetFloat();
     // load value
@@ -54,12 +63,15 @@ bool Keyframe::Load(Tokenizer& token) {
     token.GetToken(out);
 
     // check if 'in' is float or string
-    if (isdigit(in[0]) || in[0] == '-' || in[0] == '.') {
+    if (isdigit(in[0]) || in[0] == '-' || in[0] == '.') 
+    {
         // fixed
         ruleIn = std::string("fixed");
         // yes float
         tangentIn = std::stof(in);
-    } else {
+    } 
+    else 
+    {
         // flat, linear, smooth
         ruleIn = std::string(in);
         // no float
@@ -67,12 +79,15 @@ bool Keyframe::Load(Tokenizer& token) {
     }
 
     // check if 'out' is float or string
-    if (isdigit(out[0]) || out[0] == '-' || out[0] == '.') {
+    if (isdigit(out[0]) || out[0] == '-' || out[0] == '.') 
+    {
         // fixed
         ruleOut = std::string("fixed");
         // yes float
         tangentOut = std::stof(out);
-    } else {
+    } 
+    else 
+    {
         // flat, linear, smooth
         ruleOut = std::string(out);
         // no float
@@ -82,15 +97,16 @@ bool Keyframe::Load(Tokenizer& token) {
     return true;
 }
 
-void Keyframe::ComputeCoefficients(const Keyframe& nextKey) {
-    
+void Keyframe::ComputeCoefficients(const Keyframe& nextKey)
+{    
     // printf("Keyframe::ComputeCoefficients - computing for span (t0=%f -> t1=%f)\n", time, nextKey.time);
 
     float t0 = time;
     float t1 = nextKey.time;
     float dt = t1 - t0;
 
-    if (dt == 0) {
+    if (dt == 0)
+    {
         printf("Keyframe::ComputeCoefficients - dt is 0\n");
         return;
     }
@@ -104,14 +120,16 @@ void Keyframe::ComputeCoefficients(const Keyframe& nextKey) {
     // printf("Keyframe::ComputeCoefficients - tangents: v0=%f, v1=%f\n", tangentOut, nextKey.tangentIn);
 
     // hermite basis matrix
-    // glm::mat4 hermiteBasis = {
+    // glm::mat4 hermiteBasis =
+    // {
     //     { 2.0f, -2.0f, 1.0f, 1.0f },
     //     { -3.0f, 3.0f, -2.0f, -1.0f },
     //     { 0.0f, 0.0f, 1.0f, 0.0f },
     //     { 1.0f, 0.0f, 0.0f, 0.0f }
     // };
 
-    glm::mat4 hermiteBasis = {
+    glm::mat4 hermiteBasis =
+    {
         { 2.0f, -3.0f, 0.0f, 1.0f },
         { -2.0f, 3.0f, 0.0f, 0.0f },
         { 1.0f, -2.0f, 1.0f, 0.0f },
@@ -128,7 +146,8 @@ void Keyframe::ComputeCoefficients(const Keyframe& nextKey) {
     glm::vec4 coefficients = hermiteBasis * geometry;
 
     // printf("Keyframe::ComputeCoefficients - matrix multiplication:\n");
-    // for (int i = 0; i < 4; i++) {
+    // for (int i = 0; i < 4; i++)
+    // {
     //     float rowResult =
     //         hermiteBasis[i][0] * geometry.x +
     //         hermiteBasis[i][1] * geometry.y +

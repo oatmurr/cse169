@@ -3,8 +3,8 @@
 #include "Channel.h"
 #include "Pose.h"
 
-class AnimationClip {
-
+class AnimationClip
+{
 private:
     float start, end;
     std::vector<Channel> channels;

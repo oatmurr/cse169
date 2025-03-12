@@ -4,7 +4,8 @@
 
 #include "core.h"
 
-class Cube {
+class Cube
+{
 private:
     GLuint VAO;
     GLuint VBO_positions, VBO_normals, EBO;

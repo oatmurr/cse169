@@ -3,7 +3,8 @@
 #include "DOF.h"
 #include "glm/gtc/matrix_transform.hpp"
 
-class Joint {
+class Joint
+{
 private:
     // local and world matrices
     glm::mat4 localMatrix;

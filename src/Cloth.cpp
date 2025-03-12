@@ -1,7 +1,7 @@
 #include "Cloth.h"
 
-Cloth::Cloth(int width, int height, float particleSpacing, float mass, float springConstant, float dampingConstant) {
-    
+Cloth::Cloth(int width, int height, float particleSpacing, float mass, float springConstant, float dampingConstant)
+{
     // initialise wind with zero velocity, can be set later by ui
     wind = glm::vec3(0.0f);
 
@@ -12,17 +12,21 @@ Cloth::Cloth(int width, int height, float particleSpacing, float mass, float spr
     float initialHeight = 2.0f;
 
     // create grid of particles
-    for (int y = 0; y < width; y++) {
-        for (int x = 0; x < height; x++) {
-            
+    for (int y = 0; y < width; y++)
+    {
+        for (int x = 0; x < height; x++)
+        {
             // position particles in grid
             glm::vec3 position = glm::vec3(x * particleSpacing, initialHeight, y * particleSpacing);
 
             // create and store particles (fix top row of particles)
-            if (y == 0) {
+            if (y == 0)
+            {
                 Particle* particle = new Particle(position, mass, true);
                 particles.push_back(particle);
-            } else {
+            }
+            else
+            {
                 Particle* particle = new Particle(position, mass, false);
                 particles.push_back(particle);
             }
@@ -30,9 +34,10 @@ Cloth::Cloth(int width, int height, float particleSpacing, float mass, float spr
     }
 
     // create structural springs between particles
-    for (int y = 0; y < width; y++) {
-        for (int x = 0; x < height; x++) {
-
+    for (int y = 0; y < width; y++)
+    {
+        for (int x = 0; x < height; x++)
+        {
             // particle indiex
             int i = y * width + x;
 
@@ -42,20 +47,22 @@ Cloth::Cloth(int width, int height, float particleSpacing, float mass, float spr
             // p3 --- p4
 
             // horizontal spring: p1 --- p2
-            if (x < width - 1) {
+            if (x < width - 1)
+            {
                 SpringDamper* p1p2 = new SpringDamper(particles[i], particles[i + 1], springConstant, dampingConstant, particleSpacing);
                 springs.push_back(p1p2);
             }
 
             // vertical spring: p1 --- p3
-            if (y < height - 1) {
+            if (y < height - 1)
+            {
                 SpringDamper* p1p3 = new SpringDamper(particles[i], particles[i + width], springConstant, dampingConstant, particleSpacing);
                 springs.push_back(p1p3);
             }
 
             // diagonal springs: p1 --- p4, p2 --- p3
-            if (x < width - 1 && y < height - 1) {
-                
+            if (x < width - 1 && y < height - 1)
+            {    
                 // p1 --- p4
                 SpringDamper* p1p4 = new SpringDamper(particles[i], particles[i + width + 1], springConstant, dampingConstant, particleSpacing * sqrt(2.0f));
                 springs.push_back(p1p4);
@@ -68,9 +75,10 @@ Cloth::Cloth(int width, int height, float particleSpacing, float mass, float spr
     }
 
     // create bending springs between particles (skip one particle)
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-
+    for (int y = 0; y < height; y++)
+    {
+        for (int x = 0; x < width; x++)
+        {
             // particle index
             int i = y * width + x;
 
@@ -83,19 +91,22 @@ Cloth::Cloth(int width, int height, float particleSpacing, float mass, float spr
             // p7 --- p8 --- p9
 
             // horizontal bending spring: p1 --- p3
-            if (x < width - 2) {
+            if (x < width - 2)
+            {
                 SpringDamper* p1p3 = new SpringDamper(particles[i], particles[i + 2], springConstant * 0.5f, dampingConstant * 1.5f, particleSpacing * 2.0f);
                 springs.push_back(p1p3);
             }
 
             // vertical bending spring: p1 --- p7
-            if (y < height - 2) {
+            if (y < height - 2)
+            {
                 SpringDamper* p1p7 = new SpringDamper(particles[i], particles[i + width * 2], springConstant * 0.5f, dampingConstant * 1.5f, particleSpacing * 2.0f);
                 springs.push_back(p1p7);
             }
 
             // diagonal bending springs: p1 --- p9, p3 --- p7
-            if (x < width - 2 && y < height - 2) {
+            if (x < width - 2 && y < height - 2)
+            {
                 // p1 --- p9
                 SpringDamper* p1p9 = new SpringDamper(particles[i], particles[i + width * 2 + 2], springConstant * 0.5f, dampingConstant * 1.5f, (particleSpacing * 2.0f) * sqrt(2.0f));
                 springs.push_back(p1p9);
@@ -108,9 +119,10 @@ Cloth::Cloth(int width, int height, float particleSpacing, float mass, float spr
     }
 
     // create triangles: (p1, p2, p3) and (p2, p3, p4)
-    for (int y = 0; y < height - 1; y++) {
-        for (int x = 0; x < width - 1; x++) {
-
+    for (int y = 0; y < height - 1; y++)
+    {
+        for (int x = 0; x < width - 1; x++)
+        {
             // particle index
             int i = y * width + x;
 
@@ -142,14 +154,18 @@ Cloth::Cloth(int width, int height, float particleSpacing, float mass, float spr
     SetupBuffers();
 }
 
-Cloth::~Cloth() {
-    for (Particle* particle : particles) {
+Cloth::~Cloth()
+{
+    for (Particle* particle : particles)
+    {
         delete particle;
     }
-    for (SpringDamper* spring : springs) {
+    for (SpringDamper* spring : springs)
+    {
         delete spring;
     }
-    for (ClothTriangle* triangle : triangles) {
+    for (ClothTriangle* triangle : triangles)
+    {
         delete triangle;
     }
 
@@ -166,32 +182,38 @@ Cloth::~Cloth() {
     glDeleteBuffers(1, &springVBO);
 }
 
-void Cloth::SetWind(glm::vec3 wind) {
+void Cloth::SetWind(glm::vec3 wind)
+{
     this->wind = wind;
 }
 
-void Cloth::Simulate(float dt) {
+void Cloth::Simulate(float dt)
+{
     
     // float subdt = dt / 10.0f;
 
     // for (int i = 0; i < 10; i++) {
     //     // apply gravity
-    //     for (Particle* particle : particles) {
+    //     for (Particle* particle : particles)
+    // {
     //         particle->ApplyForce(gravity * particle->GetMass());
     //     }
     
     //     // compute and apply spring-damper forces
-    //     for (SpringDamper* spring : springs) {
+    //     for (SpringDamper* spring : springs)
+    //     {
     //         spring->ComputeForce();
     //     }
     
     //     // compute and apply aerodynamic forces using wind
-    //     for (ClothTriangle* triangle : triangles) {
+    //     for (ClothTriangle* triangle : triangles)
+    //     {
     //         triangle->ComputeAerodynamicForce(wind);
     //     }
     
     //     // update particle positions by integrating forces
-    //     for (Particle* particle : particles) {
+    //     for (Particle* particle : particles)
+    //     {
     //         particle->Integrate(subdt);
     //     }
     // }
@@ -199,22 +221,26 @@ void Cloth::Simulate(float dt) {
     // printf("Cloth::Simulate - dt = %f\n", dt);
 
     // apply gravity: F = m * g
-    for (Particle* particle : particles) {
+    for (Particle* particle : particles)
+    {
         particle->ApplyForce(gravity * particle->GetMass());
     }
 
     // compute and apply spring-damper forces
-    for (SpringDamper* spring : springs) {
+    for (SpringDamper* spring : springs)
+    {
         spring->ComputeForce();
     }
 
     // compute and apply aerodynamic forces using wind
-    for (ClothTriangle* triangle : triangles) {
+    for (ClothTriangle* triangle : triangles)
+    {
         triangle->ComputeAerodynamicForce(wind);
     }
 
     // update particle positions by integrating forces
-    for (Particle* particle : particles) {
+    for (Particle* particle : particles)
+    {
         particle->Integrate(dt);
     }
 
@@ -222,8 +248,8 @@ void Cloth::Simulate(float dt) {
     UpdateBuffers();
 }
 
-void Cloth::Draw(glm::mat4 viewProjMtx, GLuint shader) {
-
+void Cloth::Draw(glm::mat4 viewProjMtx, GLuint shader)
+{
     glUseProgram(shader);
     
     glUniformMatrix4fv(glGetUniformLocation(shader, "viewProj"), 1, false, (float*)&viewProjMtx);
@@ -241,7 +267,8 @@ void Cloth::Draw(glm::mat4 viewProjMtx, GLuint shader) {
     
     // line rendering for springs
     springLines.clear();
-    for (SpringDamper* spring : springs) {
+    for (SpringDamper* spring : springs)
+    {
         springLines.push_back(spring->GetP1()->GetPosition());
         springLines.push_back(spring->GetP2()->GetPosition());
     }
@@ -265,21 +292,23 @@ void Cloth::Draw(glm::mat4 viewProjMtx, GLuint shader) {
     // unbind shader
     glUseProgram(0);
 }
-void Cloth::SetupBuffers() {
-
+void Cloth::SetupBuffers()
+{
     // clear old data
     vertexPositions.clear();
     vertexNormals.clear();
     triangleIndices.clear();
 
     // for each particle, store position and initialise normal to zero
-    for (Particle* particle : particles) {
+    for (Particle* particle : particles)
+    {
         vertexPositions.push_back(particle->GetPosition());
         vertexNormals.push_back(glm::vec3(0.0f));
     }
 
     // for each triangle, store indices of particles
-    for (ClothTriangle* triangle : triangles) {
+    for (ClothTriangle* triangle : triangles)
+    {
         int indexP1 = triangle->GetIndexP1();
         int indexP2 = triangle->GetIndexP2();
         int indexP3 = triangle->GetIndexP3();
@@ -319,21 +348,23 @@ void Cloth::SetupBuffers() {
     glBindVertexArray(0);
 }
 
-void Cloth::UpdateBuffers() {
-
+void Cloth::UpdateBuffers()
+{
     // update positions
-    for (int i = 0; i < particles.size(); i++) {
+    for (int i = 0; i < particles.size(); i++)
+    {
         vertexPositions[i] = particles[i]->GetPosition();
     }
 
     // reset normals
-    for (int i = 0; i < vertexNormals.size(); i++) {
+    for (int i = 0; i < vertexNormals.size(); i++)
+    {
         vertexNormals[i] = glm::vec3(0.0f);
     }
 
     // calculate normals by averaging triangle contributions
-    for (ClothTriangle* triangle : triangles) {
-
+    for (ClothTriangle* triangle : triangles)
+    {
         // get triangle particle indices
         int indexP1 = triangle->GetIndexP1();
         int indexP2 = triangle->GetIndexP2();
@@ -349,7 +380,8 @@ void Cloth::UpdateBuffers() {
     }
 
     // normalise vertex normals
-    for (int i = 0; i < vertexNormals.size(); i++) {
+    for (int i = 0; i < vertexNormals.size(); i++)
+    {
         vertexNormals[i] = glm::normalize(vertexNormals[i]);
     }
 
@@ -363,9 +395,12 @@ void Cloth::UpdateBuffers() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Cloth::Translate(glm::vec3 translation) {
-    for (Particle* particle : particles) {
-        if (particle->IsFixed()) {
+void Cloth::Translate(glm::vec3 translation)
+{
+    for (Particle* particle : particles)
+    {
+        if (particle->IsFixed())
+        {
             particle->SetPosition(particle->GetPosition() + translation);
         }
     }

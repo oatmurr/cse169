@@ -2,23 +2,28 @@
 
 #include "Tokenizer.h"
 
-Tokenizer::Tokenizer() {
+Tokenizer::Tokenizer() 
+{
     File = 0;
     LineNum = 0;
     strcpy(FileName, "");
 }
 
-Tokenizer::~Tokenizer() {
-    if (File) {
+Tokenizer::~Tokenizer() 
+{
+    if (File) 
+    {
         printf("ERROR: Tokenizer::~Tokenizer()- Closing file '%s'\n", FileName);
         fclose((FILE *)File);
     }
 }
 
-bool Tokenizer::Open(const char *fname) {
+bool Tokenizer::Open(const char *fname) 
+{
     File = (void *)fopen(fname, "r");
     LineNum = 1;
-    if (File == 0) {
+    if (File == 0) 
+    {
         printf("ERROR: Tokenzier::Open()- Can't open file '%s'\n", fname);
         return false;
     }
@@ -26,7 +31,8 @@ bool Tokenizer::Open(const char *fname) {
     return true;
 }
 
-bool Tokenizer::Close() {
+bool Tokenizer::Close() 
+{
     if (File)
         fclose((FILE *)File);
     else
@@ -36,36 +42,42 @@ bool Tokenizer::Close() {
     return true;
 }
 
-bool Tokenizer::Abort(char *error) {
+bool Tokenizer::Abort(char *error) 
+{
     printf("ERROR '%s' line %d: %s\n", FileName, LineNum, error);
     Close();
     return false;
 }
 
-char Tokenizer::GetChar() {
+char Tokenizer::GetChar() 
+{
     char c = char(getc((FILE *)File));
     if (c == '\n') LineNum++;
     return c;
 }
 
-char Tokenizer::CheckChar() {
+char Tokenizer::CheckChar() 
+{
     int c = getc((FILE *)File);
     ungetc(c, (FILE *)File);
     return char(c);
 }
 
-int Tokenizer::GetInt() {
+int Tokenizer::GetInt() 
+{
     SkipWhitespace();
     int pos = 0;
     char temp[256];
 
     // Get first character ('-' or digit)
     char c = CheckChar();
-    if (c == '-') {
+    if (c == '-') 
+    {
         temp[pos++] = GetChar();
         c = CheckChar();
     }
-    if (!isdigit(c)) {
+    if (!isdigit(c)) 
+    {
         printf("ERROR: Tokenizer::GetInt()- Expecting int on line %d of '%s'\n", LineNum, FileName);
         return 0;
     }
@@ -82,18 +94,21 @@ int Tokenizer::GetInt() {
 // BUG: can't parse ".2", "f", or "F"
 // Uses: [-]I[.[I]][(e|E)[+|-]I]
 // Should use: [+|-](I|I.|.I|I.I)[(e|E)[+|-]I][f|F]
-float Tokenizer::GetFloat() {
+float Tokenizer::GetFloat() 
+{
     SkipWhitespace();
     int pos = 0;
     char temp[256];
 
     // Get first character ('-' or digit)
     char c = CheckChar();
-    if (c == '-') {
+    if (c == '-') 
+    {
         temp[pos++] = GetChar();
         c = CheckChar();
     }
-    if (!isdigit(c)) {
+    if (!isdigit(c)) 
+    {
         printf("ERROR: Tokenizer::GetFloat()- Expecting float on line %d of '%s' '%c'\n", LineNum, FileName, c);
         return 0.0f;
     }
@@ -103,20 +118,24 @@ float Tokenizer::GetFloat() {
     while (isdigit(c = CheckChar())) temp[pos++] = GetChar();
 
     // Get fraction component
-    if (c == '.') {
+    if (c == '.') 
+    {
         temp[pos++] = GetChar();
         while (isdigit(c = CheckChar())) temp[pos++] = GetChar();
     }
 
     // Get exponent
-    if (c == 'e' || c == 'E') {
+    if (c == 'e' || c == 'E') 
+    {
         temp[pos++] = GetChar();
         c = CheckChar();
-        if (c == '+' || c == '-') {
+        if (c == '+' || c == '-') 
+        {
             temp[pos++] = GetChar();
             c = CheckChar();
         }
-        if (!isdigit(c)) {
+        if (!isdigit(c)) 
+        {
             printf("ERROR: Tokenizer::GetFloat()- Poorly formatted float exponent on line %d of '%s'\n", LineNum, FileName);
             return 0.0f;
         }
@@ -128,12 +147,14 @@ float Tokenizer::GetFloat() {
     return float(atof(temp));
 }
 
-bool Tokenizer::GetToken(char *str) {
+bool Tokenizer::GetToken(char *str) 
+{
     SkipWhitespace();
 
     int pos = 0;
     char c = CheckChar();
-    while (c != ' ' && c != '\n' && c != '\t' && c != '\r' && !feof((FILE *)File)) {
+    while (c != ' ' && c != '\n' && c != '\t' && c != '\r' && !feof((FILE *)File)) 
+    {
         str[pos++] = GetChar();
         c = CheckChar();
     }
@@ -141,9 +162,11 @@ bool Tokenizer::GetToken(char *str) {
     return true;
 }
 
-bool Tokenizer::FindToken(const char *tok) {
+bool Tokenizer::FindToken(const char *tok) 
+{
     int pos = 0;
-    while (tok[pos] != '\0') {
+    while (tok[pos] != '\0') 
+    {
         if (feof((FILE *)File)) return false;
         char c = GetChar();
         if (c == tok[pos])
@@ -154,10 +177,12 @@ bool Tokenizer::FindToken(const char *tok) {
     return true;
 }
 
-bool Tokenizer::SkipWhitespace() {
+bool Tokenizer::SkipWhitespace() 
+{
     char c = CheckChar();
     bool white = false;
-    while (isspace(c)) {
+    while (isspace(c)) 
+    {
         GetChar();
         c = CheckChar();
         white = true;
@@ -165,17 +190,19 @@ bool Tokenizer::SkipWhitespace() {
     return white;
 }
 
-bool Tokenizer::SkipLine() {
+bool Tokenizer::SkipLine() 
+{
     char c = GetChar();
-    while (c != '\n') {
+    while (c != '\n') 
+    {
         if (feof((FILE *)File)) return false;
         c = GetChar();
     }
     return true;
 }
 
-bool Tokenizer::Reset() {
+bool Tokenizer::Reset() 
+{
     if (fseek((FILE *)File, 0, SEEK_SET)) return false;
     return true;
 }
-

@@ -25,7 +25,8 @@
 #include "backends/imgui_impl_glfw.h"
 #include "backends/imgui_impl_opengl3.h"
 
-class Window {
+class Window
+{
 public:
     // Window Properties
     static int width;

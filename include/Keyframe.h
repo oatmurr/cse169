@@ -5,8 +5,8 @@
 #include <string>
 
 // stores time, value, tangents, cubics...
-class Keyframe {
-
+class Keyframe
+{
 private:
     float time;
     float value;

@@ -2,7 +2,8 @@
 
 #include "Vertex.h"
 
-class Triangle {
+class Triangle
+{
 private:
     // vertex indices
     unsigned int vertexIndex1;

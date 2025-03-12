@@ -3,8 +3,8 @@
 #include "Keyframe.h"
 #include <vector>
 
-class Channel {
-
+class Channel
+{
 private:
     std::string extrapolationIn, extrapolationOut;
 

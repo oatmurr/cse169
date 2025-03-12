@@ -2,7 +2,8 @@
 
 #include "SpringDamper.h"
 
-class ClothTriangle {
+class ClothTriangle
+{
 private:
     // particles
     Particle* p1;

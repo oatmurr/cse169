@@ -3,7 +3,8 @@
 #include "Cube.h"
 #include "Tokenizer.h"
 
-class DOF {
+class DOF
+{
 private:
     // value
     GLfloat value;

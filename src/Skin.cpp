@@ -1,6 +1,7 @@
 #include "Skin.h"
 
-Skin::Skin() {
+Skin::Skin()
+{
     skeleton = nullptr;
 
     model = glm::mat4(1.0f);
@@ -8,13 +9,15 @@ Skin::Skin() {
     color = glm::vec3(0.8f, 0.8f, 0.8f);
 }
 
-Skin::~Skin() {
+Skin::~Skin()
+{
     delete skeleton;
 }
 
-bool Skin::Load(const char* filename, Skeleton* skeleton) {
-    
-    if (!filename) {
+bool Skin::Load(const char* filename, Skeleton* skeleton)
+{
+    if (!filename)
+    {
         return true;
     }
 
@@ -27,18 +30,20 @@ bool Skin::Load(const char* filename, Skeleton* skeleton) {
     Tokenizer token;
     token.Open(filename);
 
-    while (true) {
+    while (true)
+    {
         char temp[256];
         token.GetToken(temp);
 
-        if (strcmp(temp, "positions") == 0) {
+        if (strcmp(temp, "positions") == 0)
+        {
             int numPositions = token.GetInt();
             token.FindToken("{");
             // direct indexing is faster than repeated resizing with push_back()
             positions.resize(numPositions);
 
-            for (int i = 0; i < numPositions; i++) {
-
+            for (int i = 0; i < numPositions; i++)
+            {
                 glm::vec3 position;
                 position.x = token.GetFloat();
                 position.y = token.GetFloat();
@@ -48,13 +53,15 @@ bool Skin::Load(const char* filename, Skeleton* skeleton) {
             }
             token.FindToken("}");
 
-        } else if (strcmp(temp, "normals") == 0) {
+        }
+        else if (strcmp(temp, "normals") == 0)
+        {
             int numNormals = token.GetInt();
             token.FindToken("{");
             normals.resize(numNormals);
 
-            for (int i = 0; i < numNormals; i++) {
-                
+            for (int i = 0; i < numNormals; i++)
+            {
                 glm::vec3 normal;
                 normal.x = token.GetFloat();
                 normal.y = token.GetFloat();
@@ -64,19 +71,22 @@ bool Skin::Load(const char* filename, Skeleton* skeleton) {
             }
             token.FindToken("}");
 
-        } else if (strcmp(temp, "skinweights") == 0) {
+        }
+        else if (strcmp(temp, "skinweights") == 0)
+        {
             int numSkinweights = token.GetInt();
             token.FindToken("{");
             // theoretically, positions, normals, vertices should all be the same size
             vertices.resize(numSkinweights);
 
-            for (int i = 0; i < numSkinweights; i++) {
-
+            for (int i = 0; i < numSkinweights; i++)
+            {
                 int numAttachments = token.GetInt();
                 std::vector<int> jointIndices;
                 std::vector<float> weights;
 
-                for (int j = 0; j < numAttachments; j++) {
+                for (int j = 0; j < numAttachments; j++)
+                {
                     jointIndices.push_back(token.GetInt());
                     weights.push_back(token.GetFloat());
                 }
@@ -85,12 +95,15 @@ bool Skin::Load(const char* filename, Skeleton* skeleton) {
             }
             token.FindToken("}");
 
-        } else if (strcmp(temp, "triangles") == 0) {
+        }
+        else if (strcmp(temp, "triangles") == 0)
+        {
             int numTriangles = token.GetInt();
             token.FindToken("{");
             triangles.resize(numTriangles);
             
-            for (int i = 0; i < numTriangles; i++) {
+            for (int i = 0; i < numTriangles; i++)
+            {
                 int index0 = token.GetInt();
                 int index1 = token.GetInt();
                 int index2 = token.GetInt();
@@ -99,12 +112,15 @@ bool Skin::Load(const char* filename, Skeleton* skeleton) {
             }
             token.FindToken("}");
 
-        } else if (strcmp(temp, "bindings") == 0) {
+        }
+        else if (strcmp(temp, "bindings") == 0)
+        {
             int numBindings = token.GetInt();
             token.FindToken("{");
             bindings.resize(numBindings);
 
-            for (int i = 0; i < numBindings; i++) {
+            for (int i = 0; i < numBindings; i++)
+            {
                 token.FindToken("matrix");
                 token.FindToken("{");
                 glm::mat4 matrix(1.0f);
@@ -116,14 +132,17 @@ bool Skin::Load(const char* filename, Skeleton* skeleton) {
                 //     0.000    0.000    0.000
                 // }
                 // load 3x3 rotation part
-                for (int row = 0; row < 3; row++) {
-                    for (int col = 0; col < 3; col++) {
+                for (int row = 0; row < 3; row++)
+                {
+                    for (int col = 0; col < 3; col++)
+                    {
                         matrix[col][row] = token.GetFloat();
                     }
                 }
                 
                 // load translation (last row in file becomes last column in matrix)
-                for (int row = 0; row < 3; row++) {
+                for (int row = 0; row < 3; row++)
+                {
                     matrix[3][row] = token.GetFloat();
                 }
                 bindings[i] = matrix;
@@ -133,7 +152,9 @@ bool Skin::Load(const char* filename, Skeleton* skeleton) {
             token.FindToken("}");
             break;
 
-        } else {
+        }
+        else
+        {
             printf("Skin::Load - unrecognised token: %s\n", temp);
             token.SkipLine();
         }
@@ -144,7 +165,8 @@ bool Skin::Load(const char* filename, Skeleton* skeleton) {
     transformedNormals = normals;
 
     // allocate skinning matrices if skeleton is provided
-    if (this->skeleton) {
+    if (this->skeleton)
+    {
         skinningMatrices.resize(bindings.size());
     }
 
@@ -154,9 +176,12 @@ bool Skin::Load(const char* filename, Skeleton* skeleton) {
     printf("Skin::Load - finished loading skin\n");
     return true;
 }
-void Skin::Update() {
+
+void Skin::Update()
+{
     // if no skeleton, mesh stays in binding pose
-    if (!skeleton) {
+    if (!skeleton)
+    {
         // printf("Skin::Update - no skeleton, staying in binding pose\n");
         return;
     }
@@ -164,18 +189,23 @@ void Skin::Update() {
     // Mi = skinning matrix of joint i
     // Wi = world matrix of joint i
     // Bi = binding matrix for joint i
-    for (int i = 0; i < bindings.size(); i++) {
+    for (int i = 0; i < bindings.size(); i++)
+    {
         float det = glm::determinant(bindings[i]);
-        if (det == 0.0f) {
+        if (det == 0.0f)
+        {
             printf("Skin::Update - warning: Binding matrix %d is singular, using identity matrix instead\n", i);
             skinningMatrices[i] = skeleton->GetWorldMatrix(i);
-        } else {
+        }
+        else
+        {
             skinningMatrices[i] = skeleton->GetWorldMatrix(i) * glm::inverse(bindings[i]);
         }
     }
     // compute blended world space positions and normals
     // transform each vertex position and normal
-    for (int i = 0; i < positions.size(); i++) {
+    for (int i = 0; i < positions.size(); i++)
+    {
         glm::vec4 position = glm::vec4(positions[i], 1.0f);
         // use 0 as the 4th coordinate
         glm::vec4 normal = glm::vec4(normals[i], 0.0f);
@@ -184,7 +214,8 @@ void Skin::Update() {
         glm::vec4 blendedNormal = glm::vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
         // apply weighted transformation from each attached joint
-        for (int j = 0; j < vertices[i].GetNumAttachments(); j++) {
+        for (int j = 0; j < vertices[i].GetNumAttachments(); j++)
+        {
             // conversion from byte to float handled in Vertex::GetWeight()
             float weight = vertices[i].GetWeight(j);
             int jointIndex = vertices[i].GetJointIndex(j);
@@ -214,7 +245,8 @@ void Skin::Update() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void Skin::Draw(const glm::mat4& viewProjMtx, GLuint shader, const glm::vec3& lightDirection1, const glm::vec3& lightColor1, const glm::vec3& lightDirection2, const glm::vec3& lightColor2) {
+void Skin::Draw(const glm::mat4& viewProjMtx, GLuint shader, const glm::vec3& lightDirection1, const glm::vec3& lightColor1, const glm::vec3& lightDirection2, const glm::vec3& lightColor2)
+{
     // draw triangles using transformed positions and normals
     // printf("Skin::Draw - %zu vertices, %zu triangles\n", transformedPositions.size(), triangleIndices.size());
 
@@ -245,7 +277,8 @@ void Skin::Draw(const glm::mat4& viewProjMtx, GLuint shader, const glm::vec3& li
     glUseProgram(0);
 }
 
-void Skin::SetupBuffers() {
+void Skin::SetupBuffers()
+{
     printf("Skin::SetupBuffers - starting to setup buffers\n");
 
     // generate a vertex array (VAO) and two vertex buffer objects (VBO).
@@ -273,7 +306,8 @@ void Skin::SetupBuffers() {
     printf("Skin::SetupBuffers - normals VBO setup complete\n");
 
     // new for skinning - fill triangle indices buffer
-    for (int i = 0; i < triangles.size(); i++) {
+    for (int i = 0; i < triangles.size(); i++)
+    {
         triangleIndices.push_back(triangles[i].GetVertexIndex1());
         triangleIndices.push_back(triangles[i].GetVertexIndex2());
         triangleIndices.push_back(triangles[i].GetVertexIndex3());

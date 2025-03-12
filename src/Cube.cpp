@@ -1,6 +1,7 @@
 #include "Cube.h"
 
-Cube::Cube(glm::vec3 cubeMin, glm::vec3 cubeMax) {
+Cube::Cube(glm::vec3 cubeMin, glm::vec3 cubeMax)
+{
     // Model matrix.
     model = glm::mat4(1.0f);
 
@@ -123,7 +124,8 @@ Cube::Cube(glm::vec3 cubeMin, glm::vec3 cubeMax) {
     glBindVertexArray(0);
 }
 
-Cube::~Cube() {
+Cube::~Cube()
+{
     // Delete the VBOs and the VAO.
     glDeleteBuffers(1, &VBO_positions);
     glDeleteBuffers(1, &VBO_normals);
@@ -131,7 +133,8 @@ Cube::~Cube() {
     glDeleteVertexArrays(1, &VAO);
 }
 
-void Cube::draw(const glm::mat4& viewProjMtx, GLuint shader) {
+void Cube::draw(const glm::mat4& viewProjMtx, GLuint shader)
+{
     // actiavte the shader program
     glUseProgram(shader);
 
@@ -152,14 +155,16 @@ void Cube::draw(const glm::mat4& viewProjMtx, GLuint shader) {
 }
 
 // void Cube::update() {
-void Cube::update(const glm::mat4& model) {
+void Cube::update(const glm::mat4& model)
+{
     // Spin the cube
     // spin(0.05f);
 
     this->model = model;
 }
 
-void Cube::spin(float deg) {
+void Cube::spin(float deg)
+{
     // Update the model matrix by multiplying a rotation matrix
     model = model * glm::rotate(glm::radians(deg), glm::vec3(0.0f, 1.0f, 0.0f));
 }

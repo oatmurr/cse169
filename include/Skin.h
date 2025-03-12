@@ -4,7 +4,8 @@
 #include "Skeleton.h"
 #include <vector>
 
-class Skin {
+class Skin
+{
 private:
     // raw data from .skin file
     std::vector<glm::vec3> positions;

@@ -1,19 +1,23 @@
 #include "Skeleton.h"
 
-Skeleton::Skeleton() {
+Skeleton::Skeleton()
+{
     printf("Skeleton::Skeleton() - constructing skeleton\n");
     root = nullptr;
 }
 
-Skeleton::~Skeleton() {
+Skeleton::~Skeleton()
+{
     printf("Skeleton::~Skeleton() - destroying skeleton\n");
     delete root;
 }
 
-bool Skeleton::Load(const char* filename) {
+bool Skeleton::Load(const char* filename)
+{
     printf("Skeleton::Load - loading skeleton from file: %s\n", filename);
     
-    if (!filename) {
+    if (!filename)
+    {
         // test.skel used for project 1
         // filename = "test.skel";
         return true;
@@ -37,11 +41,13 @@ bool Skeleton::Load(const char* filename) {
     return true;
 }
 
-void Skeleton::Update() {
+void Skeleton::Update()
+{
     // printf("Skeleton::Update - updating skeleton\n");
     // traverse tree and update all joint matrices
     glm::mat4 identity = glm::mat4(1.0f);
-    if (root == nullptr) {
+    if (root == nullptr)
+    {
         // printf("Skeleton::Update - ERROR: root is null in Update()\n");
         return;
     }
@@ -49,9 +55,11 @@ void Skeleton::Update() {
     // printf("Skeleton::Update - finished updating skeleton\n");
 }
 
-void Skeleton::Draw(const glm::mat4& viewProjMtx, GLuint shader) {
+void Skeleton::Draw(const glm::mat4& viewProjMtx, GLuint shader)
+{
     // printf("Skeleton::Draw - drawing skeleton\n");
-    if (root == nullptr) {
+    if (root == nullptr)
+    {
         // printf("Skeleton::Draw - ERROR: root is null in Draw()\n");
         return;
     }
@@ -59,16 +67,20 @@ void Skeleton::Draw(const glm::mat4& viewProjMtx, GLuint shader) {
     // printf("Skeleton::Draw - finished drawing skeleton\n");
 }
 
-void Skeleton::PopulateJointList() {
-    if (root) {
+void Skeleton::PopulateJointList()
+{
+    if (root)
+    {
         root->PopulateJointList(jointList);
     }
 }
 
-glm::mat4 Skeleton::GetWorldMatrix(int jointIndex) {
+glm::mat4 Skeleton::GetWorldMatrix(int jointIndex)
+{
     return jointList[jointIndex]->GetWorldMatrix();
 }
 
-std::vector<Joint*> Skeleton::GetJointList() {
+std::vector<Joint*> Skeleton::GetJointList()
+{
     return jointList;
 }

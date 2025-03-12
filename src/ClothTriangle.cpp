@@ -1,6 +1,7 @@
 #include "ClothTriangle.h"
 
-ClothTriangle::ClothTriangle(Particle* p1, Particle* p2, Particle* p3, int indexP1, int indexP2, int indexP3) {
+ClothTriangle::ClothTriangle(Particle* p1, Particle* p2, Particle* p3, int indexP1, int indexP2, int indexP3)
+{
     this->p1 = p1;
     this->p2 = p2;
     this->p3 = p3;
@@ -11,7 +12,8 @@ ClothTriangle::ClothTriangle(Particle* p1, Particle* p2, Particle* p3, int index
     fluidDensity = 1.225;
 }
 
-void ClothTriangle::ComputeAerodynamicForce(glm::vec3 wind) {
+void ClothTriangle::ComputeAerodynamicForce(glm::vec3 wind)
+{
     // for velocity (v) of triangle use average of three particle velocities
     glm::vec3 surfaceVelocity = (p1->GetVelocity() + p2->GetVelocity() + p3->GetVelocity()) / 3.0f;
 
@@ -41,32 +43,38 @@ void ClothTriangle::ComputeAerodynamicForce(glm::vec3 wind) {
     p3->ApplyForce(aerodynamicForce / 3.0f);
 }
 
-Particle* ClothTriangle::GetP1() {
+Particle* ClothTriangle::GetP1()
+{
     return p1;
 }
 
-Particle* ClothTriangle::GetP2() {
+Particle* ClothTriangle::GetP2()
+{
     return p2;
 }
 
-Particle* ClothTriangle::GetP3() {
+Particle* ClothTriangle::GetP3()
+{
     return p3;
 }
 
-int ClothTriangle::GetIndexP1() {
+int ClothTriangle::GetIndexP1()
+{
     return indexP1;
 }
 
-int ClothTriangle::GetIndexP2() {
+int ClothTriangle::GetIndexP2()
+{
     return indexP2;
 }
 
-int ClothTriangle::GetIndexP3() {
+int ClothTriangle::GetIndexP3()
+{
     return indexP3;
 }
 
-glm::vec3 ClothTriangle::ComputeNormal() {
-
+glm::vec3 ClothTriangle::ComputeNormal()
+{
     glm::vec3 position1 = p1->GetPosition();
     glm::vec3 position2 = p2->GetPosition();
     glm::vec3 position3 = p3->GetPosition();

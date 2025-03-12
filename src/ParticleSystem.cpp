@@ -32,7 +32,7 @@ ParticleSystem::~ParticleSystem()
     glDeleteVertexArrays(1, &VAO);
 }
 
-void ParticleSystem::draw(const glm::mat4& viewProjMtx, GLuint shader)
+void ParticleSystem::Draw(const glm::mat4& viewProjMtx, GLuint shader)
 {
     // *** GL jobs ***
     glGenVertexArrays(1, &VAO);
@@ -67,17 +67,17 @@ void ParticleSystem::draw(const glm::mat4& viewProjMtx, GLuint shader)
     glUseProgram(0);
 }
 
-void ParticleSystem::update()
+void ParticleSystem::Update()
 {   
     float dt = 0.01f;
 
-    computeDensityPressure();
-    computeForces();
-    integrate(dt);
-    handleBoundaryConditions(dt);
+    ComputeDensityPressure();
+    ComputeForces();
+    Integrate(dt);
+    HandleBoundaryConditions(dt);
 }
 
-void ParticleSystem::computeDensityPressure()
+void ParticleSystem::ComputeDensityPressure()
 {
     // compute density and pressure for each particle
     for (Particle* pi : particles)
@@ -103,7 +103,7 @@ void ParticleSystem::computeDensityPressure()
                 
                 // ----- DENSITY -----
                 // W_ij = W(r, h) = (1/(h^d)) * f(q)
-                float kernelW = normalisationFactor * kernelFunction(r, smoothingRadius);
+                float kernelW = normalisationFactor * KernelFunction(r, smoothingRadius);
                 // density = ∑(m_j * W)
                 density += mass * kernelW;
             }
@@ -127,7 +127,7 @@ void ParticleSystem::computeDensityPressure()
     }
 }
 
-void ParticleSystem::computeForces()
+void ParticleSystem::ComputeForces()
 {
     // compute forces for each particle (pressure, viscosity, gravity)
     for (Particle* pi : particles)
@@ -159,14 +159,14 @@ void ParticleSystem::computeForces()
 
                 // ----- PRESSURE FORCE -----
                 // W_ij = ∇W(r, h) = (1/(h^d)) * f(q)
-                glm::vec3 gradientW = normalisationFactor * kernelGradient(r_ij, smoothingRadius);
+                glm::vec3 gradientW = normalisationFactor * KernelGradient(r_ij, smoothingRadius);
                 // F_pressure = -m * (p_i/ρ_i² + p_j/ρ_j²) * ∇W
                 pressureForce += -mass * (pi->GetPressure() / (pi->GetDensity() * pi->GetDensity()) + 
                                           pj->GetPressure() / (pj->GetDensity() * pj->GetDensity())) * gradientW;
 
                 // ----- VISCOSITY FORCE -----
                 // W_ij = ∇^2W(r, h) = (1/(h^d)) * f(q)
-                float laplacianW = normalisationFactor * kernelLaplacian(r, smoothingRadius);
+                float laplacianW = normalisationFactor * KernelLaplacian(r, smoothingRadius);
                 // F_viscosity = μ * m * (v_j - v_i)/ρ_j * ∇²W
                 viscosityForce += viscosity * mass * (pj->GetVelocity() - pi->GetVelocity()) / pj->GetDensity() * laplacianW;
             }
@@ -178,7 +178,7 @@ void ParticleSystem::computeForces()
     }
 }
 
-void ParticleSystem::integrate(float dt)
+void ParticleSystem::Integrate(float dt)
 {
     for (Particle* p : particles)
     {
@@ -186,7 +186,7 @@ void ParticleSystem::integrate(float dt)
     }
 }
 
-void ParticleSystem::handleBoundaryConditions(float dt)
+void ParticleSystem::HandleBoundaryConditions(float dt)
 {
     // ----- LENNARD-JONES DISTANCE-BASED PENALTY FORCE -----
     // from "SPH particle boundary forces for arbitrary boundaries" by Monaghan and Kajtar 2009
@@ -391,70 +391,78 @@ void ParticleSystem::handleBoundaryConditions(float dt)
             }
         }
 
-        // ----- HARD BOUNDARY WITH VELOCITY DAMPING -----
-        // as a fallback, still enforce hard boundaries to prevent particles from escaping
-        // "In order to overcome the issues of penalty-based methods and to have more control on the boundary condition, direct forcing has been proposed in [BTT09]"
-        bool collided = false;
-
-        // x-boundary
-        if (position.x < boxMin.x)
-        {
-            // adjust position to boundary
-            position.x = boxMin.x;
-            // reverse velocity with damping
-            velocity.x = -velocity.x * boundaryDamping;
-            collided = true;
-        }
-        else if (position.x > boxMax.x)
-        {
-            position.x = boxMax.x;
-            velocity.x = -velocity.x * boundaryDamping;
-            collided = true;
-        }
-
-        // y-boundary
-        if (position.y < boxMin.y)
-        {
-            position.y = boxMin.y;
-            velocity.y = -velocity.y * boundaryDamping;
-            collided = true;
-        }
-        else if (position.y > boxMax.y)
-        {
-            position.y = boxMax.y;
-            velocity.y = -velocity.y * boundaryDamping;
-            collided = true;
-        }
-
-        // z-boundary
-        if (position.z < boxMin.z)
-        {
-            position.z = boxMin.z;
-            velocity.z = -velocity.z * boundaryDamping;
-            collided = true;
-        }
-        else if (position.z > boxMax.z)
-        {
-            position.z = boxMax.z;
-            velocity.z = -velocity.z * boundaryDamping;
-            collided = true;
-        }
-
-        // update particle position and velocity if collided
-        if (collided)
-        {
-            p->SetPosition(position);
-            p->SetVelocity(velocity);
-        }
+        // enforce hard boundaries as fallback to prevent particles from escaping
+        EnforceHardBoundaries(p);
     }
 }
 
-void ParticleSystem::reset()
+void ParticleSystem::EnforceHardBoundaries(Particle* p)
+{
+    // ----- HARD BOUNDARY WITH VELOCITY DAMPING -----
+    // as a fallback, still enforce hard boundaries to prevent particles from escaping
+    // "In order to overcome the issues of penalty-based methods and to have more control on the boundary condition, direct forcing has been proposed in [BTT09]"
+    glm::vec3 position = p->GetPosition();
+    glm::vec3 velocity = p->GetVelocity();
+    bool collided = false;
+
+    // x-boundary
+    if (position.x < boxMin.x)
+    {
+        // adjust position to boundary
+        position.x = boxMin.x;
+        // reverse velocity with damping
+        velocity.x = -velocity.x * boundaryDamping;
+        collided = true;
+    }
+    else if (position.x > boxMax.x)
+    {
+        position.x = boxMax.x;
+        velocity.x = -velocity.x * boundaryDamping;
+        collided = true;
+    }
+
+    // y-boundary
+    if (position.y < boxMin.y)
+    {
+        position.y = boxMin.y;
+        velocity.y = -velocity.y * boundaryDamping;
+        collided = true;
+    }
+    else if (position.y > boxMax.y)
+    {
+        position.y = boxMax.y;
+        velocity.y = -velocity.y * boundaryDamping;
+        collided = true;
+    }
+
+    // z-boundary
+    if (position.z < boxMin.z)
+    {
+        position.z = boxMin.z;
+        velocity.z = -velocity.z * boundaryDamping;
+        collided = true;
+    }
+    else if (position.z > boxMax.z)
+    {
+        position.z = boxMax.z;
+        velocity.z = -velocity.z * boundaryDamping;
+        collided = true;
+    }
+
+    // update particle position and velocity if collided
+    if (collided)
+    {
+        p->SetPosition(position);
+        p->SetVelocity(velocity);
+    }
+}
+
+void ParticleSystem::Reset()
 {
 
 }
 
-float ParticleSystem::kernelFunction(float r, float h)
+float ParticleSystem::KernelFunction(float r, float h)
 {
     float q = r / h;
 
@@ -476,7 +484,7 @@ float ParticleSystem::kernelFunction(float r, float h)
     return kernelValue;
 }
 
-glm::vec3 ParticleSystem::kernelGradient(glm::vec3 r, float h)
+glm::vec3 ParticleSystem::KernelGradient(glm::vec3 r, float h)
 {
     float q = glm::length(r) / h;
 
@@ -498,7 +506,7 @@ glm::vec3 ParticleSystem::kernelGradient(glm::vec3 r, float h)
     return gradientMagnitude * glm::normalize(r);
 }
 
-float ParticleSystem::kernelLaplacian(float r, float h)
+float ParticleSystem::KernelLaplacian(float r, float h)
 {
     float q = r / h;
 

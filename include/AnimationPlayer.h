@@ -4,8 +4,8 @@
 #include "Rig.h"
 
 // pointer to animation, pointer to skeleton, keeps track of time, accesses animation data & poses the skeleton.
-class AnimationPlayer {
-    
+class AnimationPlayer
+{    
 private:
     float time;
     AnimationClip *clip;

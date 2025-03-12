@@ -1,6 +1,7 @@
 #include "DOF.h"
 
-DOF::DOF() {
+DOF::DOF()
+{
     // radians
     value = 0.0f;
 
@@ -9,30 +10,40 @@ DOF::DOF() {
     max = 100000.0f;
 }
 
-GLfloat DOF::GetValue() {
+GLfloat DOF::GetValue()
+{
     return value;
 }
 
-void DOF::SetValue(GLfloat value) {
+void DOF::SetValue(GLfloat value)
+{
     // clamp to limits
-    if (value < min) {
+    if (value < min)
+    {
         this->value = min;
-    } else if (value > max) {
+    } 
+    else if (value > max)
+    {
         this->value = max;
-    } else {
+    } 
+    else
+    {
         this->value = value;
     }
 }
 
-void DOF::SetMinMax(GLfloat min, GLfloat max) {
+void DOF::SetMinMax(GLfloat min, GLfloat max)
+{
     this->min = min;
     this->max = max;
 }
 
-float DOF::GetMin() {
+float DOF::GetMin()
+{
     return this->min;
 }
 
-float DOF::GetMax() {
+float DOF::GetMax()
+{
     return this->max;
 }

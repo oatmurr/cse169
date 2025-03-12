@@ -6,8 +6,8 @@
 // If the rig contains only simple independent DOFs, the pose can just be an array of floats
 // 𝚽 = [𝜑1, 𝜑2, ..., 𝜑𝑁]
 
-class Pose {
-    
+class Pose
+{    
 private:
     std::vector<DOF> DOFs;
 

@@ -18,7 +18,8 @@
 // the next carraige return. FindToken searches for a specific token and returns
 // true if it found it.
 
-class Tokenizer {
+class Tokenizer
+{
 public:
     Tokenizer();
     ~Tokenizer();

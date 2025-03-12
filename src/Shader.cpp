@@ -1,11 +1,13 @@
 #include "Shader.h"
 
-enum ShaderType { 
+enum ShaderType
+{ 
 	vertex,
 	fragment 
 };
 
-GLuint LoadSingleShader(const char* shaderFilePath, ShaderType type) {
+GLuint LoadSingleShader(const char* shaderFilePath, ShaderType type)
+{
     // Create a shader id.
     GLuint shaderID = 0;
     if (type == vertex)
@@ -16,12 +18,15 @@ GLuint LoadSingleShader(const char* shaderFilePath, ShaderType type) {
     // Try to read shader codes from the shader file.
     std::string shaderCode;
     std::ifstream shaderStream(shaderFilePath, std::ios::in);
-    if (shaderStream.is_open()) {
+    if (shaderStream.is_open())
+    {
         std::string Line = "";
         while (getline(shaderStream, Line))
             shaderCode += "\n" + Line;
         shaderStream.close();
-    } else {
+    }
+    else
+    {
         std::cerr << "Impossible to open " << shaderFilePath << ". "
                   << "Check to make sure the file exists and you passed in the "
                   << "right filepath!"
@@ -41,13 +46,16 @@ GLuint LoadSingleShader(const char* shaderFilePath, ShaderType type) {
     // Check Shader.
     glGetShaderiv(shaderID, GL_COMPILE_STATUS, &Result);
     glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-    if (InfoLogLength > 0) {
+    if (InfoLogLength > 0)
+    {
         std::vector<char> shaderErrorMessage(InfoLogLength + 1);
         glGetShaderInfoLog(shaderID, InfoLogLength, NULL, shaderErrorMessage.data());
         std::string msg(shaderErrorMessage.begin(), shaderErrorMessage.end());
         std::cerr << msg << std::endl;
         return 0;
-    } else {
+    }
+    else
+    {
         if (type == vertex)
             printf("Successfully compiled vertex shader!\n");
         else if (type == fragment)
@@ -57,7 +65,8 @@ GLuint LoadSingleShader(const char* shaderFilePath, ShaderType type) {
     return shaderID;
 }
 
-GLuint LoadShaders(const char* vertexFilePath, const char* fragmentFilePath) {
+GLuint LoadShaders(const char* vertexFilePath, const char* fragmentFilePath)
+{
     // Create the vertex shader and fragment shader.
     GLuint vertexShaderID = LoadSingleShader(vertexFilePath, vertex);
     GLuint fragmentShaderID = LoadSingleShader(fragmentFilePath, fragment);
@@ -78,14 +87,17 @@ GLuint LoadShaders(const char* vertexFilePath, const char* fragmentFilePath) {
     // Check the program.
     glGetProgramiv(programID, GL_LINK_STATUS, &Result);
     glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-    if (InfoLogLength > 0) {
+    if (InfoLogLength > 0)
+    {
         std::vector<char> ProgramErrorMessage(InfoLogLength + 1);
         glGetProgramInfoLog(programID, InfoLogLength, NULL, ProgramErrorMessage.data());
         std::string msg(ProgramErrorMessage.begin(), ProgramErrorMessage.end());
         std::cerr << msg << std::endl;
         glDeleteProgram(programID);
         return 0;
-    } else {
+    }
+    else
+    {
         printf("Successfully linked program!\n");
     }
 
