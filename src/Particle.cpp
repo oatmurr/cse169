@@ -1,6 +1,7 @@
 #include "Particle.h"
 
-Particle::Particle(glm::vec3 position, float mass, bool fixed) {
+Particle::Particle(glm::vec3 position, float mass, bool fixed)
+{
     this->position = position;
     this->velocity = glm::vec3(0);
     this->force = glm::vec3(0);
@@ -8,15 +9,18 @@ Particle::Particle(glm::vec3 position, float mass, bool fixed) {
     this->fixed = fixed;
 }
 
-void Particle::ApplyForce(glm::vec3 force) {
-    if (!fixed) {
+void Particle::ApplyForce(glm::vec3 force)
+{
+    if (!fixed)
+    {
         this->force += force;
     }
 }
 
-void Particle::Integrate(float dt) {
-    
-    if (!fixed) {
+void Particle::Integrate(float dt)
+{
+    if (!fixed)
+    {
         // apply newton's second law (f = ma)
         glm::vec3 acceleration = force / mass;
 
@@ -28,8 +32,8 @@ void Particle::Integrate(float dt) {
 
         // ground collision
         float groundHeight = 0.0f;
-        if (position.y < groundHeight) {
-
+        if (position.y < groundHeight)
+        {
             // push particle to surface
             position.y = groundHeight;
 
@@ -46,54 +50,67 @@ void Particle::Integrate(float dt) {
     force = glm::vec3(0);
 }
 
-glm::vec3 Particle::GetPosition() {
+glm::vec3 Particle::GetPosition()
+{
     return position;
 }
 
-glm::vec3 Particle::GetVelocity() {
+glm::vec3 Particle::GetVelocity()
+{
     return velocity;
 }
 
-glm::vec3 Particle::GetForce() {
+glm::vec3 Particle::GetForce()
+{
     return force;
 }
 
-float Particle::GetMass() {
+float Particle::GetMass()
+{
     return mass;
 }
 
-float Particle::GetDensity() {
+float Particle::GetDensity()
+{
     return density;
 }
 
-float Particle::GetPressure() {
+float Particle::GetPressure()
+{
     return pressure;
 }
 
-void Particle::SetPosition(glm::vec3 position) {
+void Particle::SetPosition(glm::vec3 position)
+{
     this->position = position;
 }
 
-void Particle::SetVelocity(glm::vec3 velocity) {
+void Particle::SetVelocity(glm::vec3 velocity)
+{
     this->velocity = velocity;
 }
 
-void Particle::SetForce(glm::vec3 force) {
+void Particle::SetForce(glm::vec3 force)
+{
     this->force = force;
 }
 
-void Particle::SetMass(float mass) {
+void Particle::SetMass(float mass)
+{
     this->mass = mass;
 }
 
-void Particle::SetDensity(float density) {
+void Particle::SetDensity(float density)
+{
     this->density = density;
 }
 
-void Particle::SetPressure(float pressure) {
+void Particle::SetPressure(float pressure)
+{
     this->pressure = pressure;
 }
 
-bool Particle::IsFixed() {
+bool Particle::IsFixed()
+{
     return fixed;
 }

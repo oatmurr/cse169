@@ -3,7 +3,8 @@
 #include "core.h"
 #include <iostream>
 
-class Particle {
+class Particle
+{
 private:
     glm::vec3 position;
     glm::vec3 velocity;
