@@ -12,7 +12,7 @@ public:
 
     // SPH stuff
     float smoothingRadius;
-    float particleMass;
+    float mass;
     float restDensity;
     float viscosity;
     float gasConstant;
@@ -29,7 +29,7 @@ public:
     std::vector<Particle*> particles;
 
     // constructor/destructor
-    ParticleSystem(int size, glm::vec3 color, float smoothingRadius, float particleMass, float restDensity, float viscosity, float gasConstant, glm::vec3 gravity, float boundaryStiffness, float boundaryDamping, glm::vec3 boxMin, glm::vec3 boxMax);
+    ParticleSystem(int size, glm::vec3 color, float smoothingRadius, float mass, float restDensity, float viscosity, float gasConstant, glm::vec3 gravity, float boundaryStiffness, float boundaryDamping, glm::vec3 boxMin, glm::vec3 boxMax);
     ~ParticleSystem();
 
     // core

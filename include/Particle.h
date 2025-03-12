@@ -40,7 +40,5 @@ public:
     void SetDensity(float density);
     void SetPressure(float pressure);
 
-
     bool IsFixed();
-
 };

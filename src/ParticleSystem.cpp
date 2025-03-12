@@ -1,6 +1,6 @@
 #include "ParticleSystem.h"
 
-ParticleSystem::ParticleSystem(int size, glm::vec3 color, float smoothingRadius, float particleMass, float restDensity, float viscosity, float gasConstant, glm::vec3 gravity, float boundaryStiffness, float boundaryDamping, glm::vec3 boxMin, glm::vec3 boxMax)
+ParticleSystem::ParticleSystem(int size, glm::vec3 color, float smoothingRadius, float mass, float restDensity, float viscosity, float gasConstant, glm::vec3 gravity, float boundaryStiffness, float boundaryDamping, glm::vec3 boxMin, glm::vec3 boxMax)
 {
     this->size = size;
     this->particles = std::vector<Particle*>(size);
@@ -8,7 +8,7 @@ ParticleSystem::ParticleSystem(int size, glm::vec3 color, float smoothingRadius,
     this->color = color;
 
     this->smoothingRadius = smoothingRadius;
-    this->particleMass = particleMass;
+    this->mass = mass;
     this->restDensity = restDensity;
     this->viscosity = viscosity;
     this->gasConstant = gasConstant;
@@ -68,6 +68,80 @@ void ParticleSystem::draw(const glm::mat4& viewProjMtx, GLuint shader)
 }
 
 void ParticleSystem::update()
+{   
+    float dt = 0.01f;
+
+    computeDensityPressure();
+    computeForces();
+    integrate(dt);
+    handleBoundaryConditions(dt);
+}
+
+void ParticleSystem::computeDensityPressure()
+{
+    // compute density and pressure for each particle
+    for (Particle* pi : particles)
+    {   
+        // reset density
+        float density = 0.0f;
+
+        // sum up contributions from other particles
+        // kernel function: W_ij = W((‖x_i - x_j‖)/(h)) = W(q) = (1/(h^d)) * f(q)
+        for (Particle* pj : particles)
+        {   
+            // distance betwen particles: x_i - x_j
+            glm::vec3 r_ij = pj->GetPosition() - pi->GetPosition();
+
+            // magnitude of r_ij: ‖x_i - x_j‖
+            float r = glm::length(r_ij);
+
+            // apply smoothing kernel
+            if (r < smoothingRadius)
+            {
+                // normalisation factor: 1/(h^d)
+                float normalisationFactor = 1.0f / (smoothingRadius * smoothingRadius * smoothingRadius);
+                
+                // (1/(h^d)) * f(q)
+                density += mass * normalisationFactor * kernelFunction(r, smoothingRadius);
+            }
+        }
+
+        pi->SetDensity(density);
+
+        // tait equation of state for water (γ = 7): pi = k[(ρ/ρ₀)^γ - 1]
+        // from section 1.3 of "SPH Fluids in Computer Graphics" by Ihmsen et al. 2014
+        float pressure = gasConstant * (pow(density / restDensity, 7.0f) - 1.0f);
+        
+        pi->SetPressure(pressure);
+
+        // ensure pressure is not negative
+        if (pi->GetPressure() < 0.0f)
+        {
+            std::cout << "ParticleSystem::computeDensityPressure - negative pressure" << std::endl;
+            pi->SetPressure(0.0f);
+        }
+    }
+}
+
+void ParticleSystem::computeForces()
+{
+
+}
+
+void ParticleSystem::integrate(float dt)
+{
+    for (Particle* p : particles)
+    {
+        p->Integrate(dt);
+    }
+}
+
+void ParticleSystem::handleBoundaryConditions(float dt)
+{
+
+}
+
+void ParticleSystem::reset()
 {
 
 }
