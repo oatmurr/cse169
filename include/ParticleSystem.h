@@ -42,7 +42,7 @@ public:
     void integrate(float dt);
     void handleBoundaryConditions(float dt);
 
-    /* --- KERNELS --- */
+    // ----- KERNELS -----
     // support radius = 2h
     // q = r/h
 
