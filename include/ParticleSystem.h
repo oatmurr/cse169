@@ -54,6 +54,7 @@ public:
 
     // boundary
     void HandleBoundaryConditions(float dt);
+    glm::vec3 CalculateLennardJonesForce(glm::vec3 position, float boundary, int axis, bool isMin, float epsilon, float sigma, float d_max);
     void EnforceHardBoundaries(Particle* p);
     void SetupBoxBuffers();
     void DrawBoundaries(const glm::mat4& viewProjMtx, GLuint shader);
@@ -74,7 +75,7 @@ public:
 
     // pressure - ∇W(r, h)
     // f(q) = (3/(2π)) * {
-    //     (-2q * (3/2) * q^2)                  for 0 ≤ q < 1
+    //     (-2q + (3/2) * q^2)                  for 0 ≤ q < 1
     //     (-1/2) * (2 - q)^2                   for 1 ≤ q < 2
     //     0                                    for q ≥ 2
     glm::vec3 KernelGradient(glm::vec3 r, float h);
@@ -82,7 +83,7 @@ public:
     // viscosity - ∇^2W(r, h)
     // f(q) = (3/(2π)) * {
     //     (-2 + 3q)                            for 0 ≤ q < 1
-    //     -(2 - q)^2                           for 1 ≤ q < 2
+    //     (2 - q)                              for 1 ≤ q < 2
     //     0                                    for q ≥ 2
     float KernelLaplacian(float r, float h);
 

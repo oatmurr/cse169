@@ -59,8 +59,15 @@ ParticleSystem::ParticleSystem(int size, glm::vec3 color, float smoothingRadius,
             blobCenterZ - blobLength * 0.5f + z * particleSpacing
         );
 
-        // create particle
+        // create particle with small random velocity
+        // glm::vec3 randomVelocity
+        // (
+        //     (float)rand() / RAND_MAX * 0.1f - 0.05f,
+        //     (float)rand() / RAND_MAX * 0.1f - 0.05f,
+        //     (float)rand() / RAND_MAX * 0.1f - 0.05f
+        // );
         particles[i] = new Particle(position, mass, false);
+        // particles[i]->SetVelocity(randomVelocity);
     }
 
     glGenVertexArrays(1, &VAO);
@@ -311,201 +318,35 @@ void ParticleSystem::HandleBoundaryConditions(float dt)
     for (Particle* p : particles)
     {
         glm::vec3 position = p->GetPosition();
-        glm::vec3 velocity = p->GetVelocity();
         glm::vec3 force = glm::vec3(0.0f);
 
         // x-min boundary
-        if (position.x < boxMin.x)
-        {   
-            // r = distance from boundary
-            float r = boxMin.x - position.x;
-
-            // particle is inside the boundary
-            if (r < 0.0f)
-            {
-                r = -r;
-            }
-
-            // apply force only within interaction range
-            if (r < d_max)
-            {
-                // ε * ((12σ¹²)/(r¹³))
-                float repulsionForce = epsilon * (12.0f * pow(sigma, 12.0f) / (pow(r, 13.0f)));
-                // ε * ((6σ⁶)/(r⁷))
-                float attractionForce = epsilon * (6.0f * pow(sigma, 6.0f) / (pow(r, 7.0f)));
-                // ε * [(12σ¹²)/(r¹³) - (6σ⁶)/(r⁷)]
-                float totalForce = repulsionForce - attractionForce;
-                // r̂ points in +x direction
-                glm::vec3 r_hat = glm::vec3(1.0f, 0.0f, 0.0f);
-                // F_LJ = ε * [(12σ¹²)/(r¹³) - (6σ⁶)/(r⁷)] * r̂
-                glm::vec3 F_LJ = totalForce * r_hat;
-                
-                force += F_LJ;
-            }
-        }
-
+        force += CalculateLennardJonesForce(position, boxMin.x, 0, true, epsilon, sigma, d_max);
         // x-max boundary
-        if (position.x > boxMax.x)
-        {
-            // r = distance from boundary
-            float r = position.x - boxMax.x;
-
-            // particle is inside the boundary
-            if (r < 0.0f)
-            {
-                r = -r;
-            }
-
-            // apply force only within interaction range
-            if (r < d_max)
-            {
-                // ε * ((12σ¹²)/(r¹³))
-                float repulsionForce = epsilon * (12.0f * pow(sigma, 12.0f) / (pow(r, 13.0f)));
-                // ε * ((6σ⁶)/(r⁷))
-                float attractionForce = epsilon * (6.0f * pow(sigma, 6.0f) / (pow(r, 7.0f)));
-                // ε * [(12σ¹²)/(r¹³) - (6σ⁶)/(r⁷)]
-                float totalForce = repulsionForce - attractionForce;
-                // r̂ points in -x direction
-                glm::vec3 r_hat = glm::vec3(-1.0f, 0.0f, 0.0f);
-                // F_LJ = ε * [(12σ¹²)/(r¹³) - (6σ⁶)/(r⁷)] * r̂
-                glm::vec3 F_LJ = totalForce * r_hat;
-
-                force += F_LJ;
-            }
-        }
-
+        force += CalculateLennardJonesForce(position, boxMax.x, 0, false, epsilon, sigma, d_max);
         // y-min boundary
-        if (position.y < boxMin.y)
-        {   
-            // r = distance from boundary
-            float r = boxMin.y - position.y;
-
-            // particle is inside the boundary
-            if (r < 0.0f)
-            {
-                r = -r;
-            }
-
-            // apply force only within interaction range
-            if (r < d_max)
-            {
-                // ε * ((12σ¹²)/(r¹³))
-                float repulsionForce = epsilon * (12.0f * pow(sigma, 12.0f) / (pow(r, 13.0f)));
-                // ε * ((6σ⁶)/(r⁷))
-                float attractionForce = epsilon * (6.0f * pow(sigma, 6.0f) / (pow(r, 7.0f)));
-                // ε * [(12σ¹²)/(r¹³) - (6σ⁶)/(r⁷)]
-                float totalForce = repulsionForce - attractionForce;
-                // r̂ points in +y direction
-                glm::vec3 r_hat = glm::vec3(0.0f, 1.0f, 0.0f);
-                // F_LJ = ε * [(12σ¹²)/(r¹³) - (6σ⁶)/(r⁷)] * r̂
-                glm::vec3 F_LJ = totalForce * r_hat;
-                
-                force += F_LJ;
-            }
-        }
-
+        force += CalculateLennardJonesForce(position, boxMin.y, 1, true, epsilon, sigma, d_max);
         // y-max boundary
-        if (position.y > boxMax.y)
-        {
-            // r = distance from boundary
-            float r = position.y - boxMax.y;
-
-            // particle is inside the boundary
-            if (r < 0.0f)
-            {
-                r = -r;
-            }
-
-            // apply force only within interaction range
-            if (r < d_max)
-            {
-                // ε * ((12σ¹²)/(r¹³))
-                float repulsionForce = epsilon * (12.0f * pow(sigma, 12.0f) / (pow(r, 13.0f)));
-                // ε * ((6σ⁶)/(r⁷))
-                float attractionForce = epsilon * (6.0f * pow(sigma, 6.0f) / (pow(r, 7.0f)));
-                // ε * [(12σ¹²)/(r¹³) - (6σ⁶)/(r⁷)]
-                float totalForce = repulsionForce - attractionForce;
-                // r̂ points in -y direction
-                glm::vec3 r_hat = glm::vec3(0.0f, -1.0f, 0.0f);
-                // F_LJ = ε * [(12σ¹²)/(r¹³) - (6σ⁶)/(r⁷)] * r̂
-                glm::vec3 F_LJ = totalForce * r_hat;
-
-                force += F_LJ;
-            }
-        }
-
+        force += CalculateLennardJonesForce(position, boxMax.y, 1, false, epsilon, sigma, d_max);
         // z-min boundary
-        if (position.z < boxMin.z)
-        {   
-            // r = distance from boundary
-            float r = boxMin.z - position.z;
-
-            // particle is inside the boundary
-            if (r < 0.0f)
-            {
-                r = -r;
-            }
-
-            // apply force only within interaction range
-            if (r < d_max)
-            {
-                // ε * ((12σ¹²)/(r¹³))
-                float repulsionForce = epsilon * (12.0f * pow(sigma, 12.0f) / (pow(r, 13.0f)));
-                // ε * ((6σ⁶)/(r⁷))
-                float attractionForce = epsilon * (6.0f * pow(sigma, 6.0f) / (pow(r, 7.0f)));
-                // ε * [(12σ¹²)/(r¹³) - (6σ⁶)/(r⁷)]
-                float totalForce = repulsionForce - attractionForce;
-                // r̂ points in +z direction
-                glm::vec3 r_hat = glm::vec3(0.0f, 0.0f, 1.0f);
-                // F_LJ = ε * [(12σ¹²)/(r¹³) - (6σ⁶)/(r⁷)] * r̂
-                glm::vec3 F_LJ = totalForce * r_hat;
-                
-                force += F_LJ;
-            }
-        }
-
+        force += CalculateLennardJonesForce(position, boxMin.z, 2, true, epsilon, sigma, d_max);
         // z-max boundary
-        if (position.z > boxMax.z)
-        {
-            // r = distance from boundary
-            float r = position.z - boxMax.z;
-
-            // particle is inside the boundary
-            if (r < 0.0f)
-            {
-                r = -r;
-            }
-
-            // apply force only within interaction range
-            if (r < d_max)
-            {
-                // ε * ((12σ¹²)/(r¹³))
-                float repulsionForce = epsilon * (12.0f * pow(sigma, 12.0f) / (pow(r, 13.0f)));
-                // ε * ((6σ⁶)/(r⁷))
-                float attractionForce = epsilon * (6.0f * pow(sigma, 6.0f) / (pow(r, 7.0f)));
-                // ε * [(12σ¹²)/(r¹³) - (6σ⁶)/(r⁷)]
-                float totalForce = repulsionForce - attractionForce;
-                // r̂ points in -z direction
-                glm::vec3 r_hat = glm::vec3(0.0f, 0.0f, -1.0f);
-                // F_LJ = ε * [(12σ¹²)/(r¹³) - (6σ⁶)/(r⁷)] * r̂
-                glm::vec3 F_LJ = totalForce * r_hat;
-
-                force += F_LJ;
-            }
-        }
+        force += CalculateLennardJonesForce(position, boxMax.z, 2, false, epsilon, sigma, d_max);
 
         p->ApplyForce(force);
-        
-        // enforce hard boundaries as fallback to prevent particles from escaping
+    }
+
+    // ----- HARD BOUNDARY WITH VELOCITY DAMPING -----
+    // as a fallback, still enforce hard boundaries to prevent particles from escaping
+    // "In order to overcome the issues of penalty-based methods and to have more control on the boundary condition, direct forcing has been proposed in [BTT09]"
+    for (Particle* p : particles)
+    {
         EnforceHardBoundaries(p);
     }
 }
 
 void ParticleSystem::EnforceHardBoundaries(Particle* p)
 {
-    // ----- HARD BOUNDARY WITH VELOCITY DAMPING -----
-    // as a fallback, still enforce hard boundaries to prevent particles from escaping
-    // "In order to overcome the issues of penalty-based methods and to have more control on the boundary condition, direct forcing has been proposed in [BTT09]"
     glm::vec3 position = p->GetPosition();
     glm::vec3 velocity = p->GetVelocity();
     bool collided = false;
@@ -559,6 +400,54 @@ void ParticleSystem::EnforceHardBoundaries(Particle* p)
     {
         p->SetPosition(position);
         p->SetVelocity(velocity);
+    }
+}
+
+glm::vec3 ParticleSystem::CalculateLennardJonesForce(glm::vec3 position, float boundary, int axis, bool isMin, float epsilon, float sigma, float d_max)
+{
+    glm::vec3 force = glm::vec3(0.0f);
+
+    // calculate distance to boundary (min/max set by isMin)
+    float distance;
+    if (isMin)
+    {
+        // distance to min boundary
+        distance = position[axis] - boundary;
+    }
+    else
+    {
+        // distance to max boundary
+        distance = boundary - position[axis];
+    }
+
+    // apply force only within interaction range
+    if (distance < d_max && distance > -d_max)
+    {
+        // r = distance from boundary
+        float r = fabs(distance);
+        
+        // ε * ((12σ¹²)/(r¹³))
+        float repulsionForce = epsilon * (12.0f * pow(sigma, 12.0f) / (pow(r, 13.0f)));
+        // ε * ((6σ⁶)/(r⁷))
+        float attractionForce = epsilon * (6.0f * pow(sigma, 6.0f) / (pow(r, 7.0f)));
+        // ε * [(12σ¹²)/(r¹³) - (6σ⁶)/(r⁷)]
+        float totalForce = repulsionForce - attractionForce;
+
+        // r̂ = direction vector pointing away from boundary
+        glm::vec3 r_hat = glm::vec3(0.0f);
+        
+        if (r < 0.0f)
+        {
+            // negative r̂ if outside boundary
+            r_hat[axis] = -1.0f;
+        }
+        else
+        {
+            // positive r̂ if inside boundary
+            r_hat[axis] = 1.0f;
+        }
+        // F_LJ = ε * [(12σ¹²)/(r¹³) - (6σ⁶)/(r⁷)] * r̂
+        glm::vec3 F_LJ = totalForce * r_hat;
     }
 }
 
@@ -644,10 +533,10 @@ glm::vec3 ParticleSystem::KernelGradient(glm::vec3 r, float h)
 
     float coefficient = 3.0f / (2.0f * M_PI);
 
-    // (3/(2π)) * ((-2q * (3/2) * q^2)) for 0 ≤ q < 1
+    // (3/(2π)) * ((-2q + (3/2) * q^2)) for 0 ≤ q < 1
     if (q < 1.0f)
     {
-        gradientMagnitude = coefficient * (-2.0f * q * 1.5f * q * q);
+        gradientMagnitude = coefficient * (-2.0f * q + 1.5f * q * q);
     }
     // (3/(2π)) * ((-1/2) * (2 - q)^2) for 1 ≤ q < 2
     else if (q < 2.0f)
@@ -671,10 +560,10 @@ float ParticleSystem::KernelLaplacian(float r, float h)
     {
         laplacianValue = coefficient * (-2.0f + 3.0f * q);
     }
-    // (3/(2π)) * (-(2 - q)^2) for 1 ≤ q < 2
+    // (3/(2π)) * (2 - q) for 1 ≤ q < 2
     else if (q < 2.0f)
     {
-        laplacianValue = coefficient * -std::pow(2.0f - q, 2.0f);
+        laplacianValue = coefficient * (2.0f - q);
     }
 
     return laplacianValue;
