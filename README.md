@@ -173,3 +173,73 @@ The Triangles will need to compute their normal every Update in order to do the 
 -   Loop through all the particles again and normalize the normal
 
 To implement the ‘fixed’ particles, just add an additional bool to each Particle to indicate it’s fixed. Modify the Particle::Update() to do nothing if the fixed bool is true. To do the user controls, add a control function to the Cloth that responds to keyboard presses and loops through all the particles and adjusts the position of only the fixed particles accordingly. The fixed bool is set through the Cloth initialization process, so that you can experiment with fixing different parts of the cloth (such as an entire row of vertices or just the corners, etc.).
+
+## Project 5: Choose Your Own
+
+### Assignment
+
+For project 5, you can choose one of the listed options or do something that you choose. If you choose your own project, please talk to me first so we can work out some details.
+
+Here are some project possibilities:
+
+### Option 1: Jacobian Inverse Kinematics
+
+Implement an inverse kinematics demo that has a single chain of 5 or more links. The links can be 1 or more DOF rotational joints, but they must be arranged so that the chain can be manipulated in 3D, not just 2D. There should be keyboard (or UI) controls that allow the user to position the goal in x, y, and z, and displays the goal in 3D. The IK chain should touch the goal position with the end of the chain or reach in the correct direction if it is out of range.
+
+I suggest using the Jacobian transpose approach as it is the simplest and does not require any explicit construction of a Jacobian matrix. It operates one joint at a time and is the most intuitive.
+Grading
+
+### Option 2: Neural Network Inverse Kinematics
+
+Train a neural network to solve IK problems and do some analysis on its results. You can use an 'off-the-shelf' neural network system (such as Tensor Flow). Generate training samples by making random poses and evaluating the forward kinematics. Provide some analysis of the results, such as
+
+-   Measurement of accuracy
+-   See how it varies when given a well constrained vs. underconstrained system
+-   Set up different internal network layers to determine which works best
+-   Provide information on training time, number of epochs, etc.
+
+If you choose this project, please talk to the instructor to work out some of the specific goals and grading details.
+
+### Option 3: Particle System
+
+Make a program that simulates a general purpose particle system. The program must have some sort of graphical user interface that allows for adjusting several parameters interactively and displays the results on the fly. The particles should support physics for gravity, aerodynamic drag, and collisions with a ground plane at the least. New particles should be continually created at an adjustable rate, and the particles should also have a life span that is assigned when the particle is created and then counts down to 0, causing the particle to disappear. Particles can render as small spheres or as sprites. The following properties should be adjustable:
+
+-   Particle creation rate (particles per second)
+-   Initial position & variance (X, Y, Z)
+-   Initial velocity & variance (X, Y, Z)
+-   Initial life span & variance
+-   Gravity
+-   Air density
+-   Drag coefficient
+-   Particle radius (for both rendering & aerodynamic drag)
+-   Collision elasticity
+-   Collision friction
+
+### Option 4: SPH (Particle Based Fluid Simulation) - this is the one i did
+
+Implement a basic SPH simulation with a limited number of particles (at least a few hundred). Choose a physics algorithm from one of the ones in the paper. Display the particles as points, or as small spheres, or something. You don't need to implement any spatial data structures or fancy rendering- just get the basic physics working with as many particles as you can get running at a reasonable speed. The demo should have a reset key or possibly several keys that set up different initial conditions.
+
+The particles should be constrained to a box to keep it under control, but SPH requires that the walls of the box act as a spring-like repulsion force, not just a hard boundary.
+
+I suggest doing a demo where a blob of particles initializes above some ground plane and drops to the ground. You should see something resembling a splash.
+
+### Option 5: Quaternion Interpolation
+
+Make a program that displays 5 'key' boxes in a row and allows the user to rotate each box arbitrarily around x, y, and z using keyboard controls or a GUI. Then, a key should turn on the interpolation which will show a box smoothly passing through the set of 5 key boxes, by using quaternion interpolation. It should allow the user to select between linear and Catmull-Rom interpolation modes, where the linear mode just 'slerps' directly between each key and the Catmull-Rom mode uses the sequence of slerp operations described in the 'Curves' lecture to generate a smoother rotation sequence. In either case, the rotations should always go the 'short way'.
+
+**You must implement your own quaternion class and functionality** (i.e., you can't use the one in GLM, but you can use vectors & matrices from GLM).
+
+I suggest making a quaternion class with functions for:
+
+-   float Dot(Quaternion &q0,&Quaternion &q1);
+-   Multiply(Quaternion &q0,&Quaternion &q1);
+-   MakeRotateX(float t), MakeRotateY(float t), MakeRotateZ(float t);
+-   ToMatrix44(glm::mat4 &m);
+-   Slerp(float t,Quaternion &q0,Quaternion &q1);
+-   CatmullRom(float t,Quaternion &q0,Quaternion &q1,Quaternion &q2,Quatnion &q3);
+
+If you do all of the key box rotations with quaternions, then you only need to convert to a matrix to render, and you should never need to convert from a matrix.
+
+Normally, for a single slerp, it's advised to check the dot product of the two quaternions. If it's negative, you negate either one of the quaternions and that will insure that the interpolation will go the short way between the two orientations, rather than the long way.
+
+The Catmull-Rom interpolation is built up from several slerps of other slerps (6 total). If you perform the test on each individual slerp, you might run into problems where a flip suddenly takes place partway along the interpolation. This results in a sudden pop of orientation. To fix this, all of the flipping of quaternions should take place before running the interpolation. If you are interpolating between a sequence of quaternions, you should loop through the whole set once, and flip as necessary so that the dot product between any two consecutive ones is positive.
