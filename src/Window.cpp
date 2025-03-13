@@ -395,6 +395,12 @@ void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, 
 
             case GLFW_KEY_R:
                 resetCamera();
+
+                #ifdef INCLUDE_SPH
+                if (particleSystem) {
+                    particleSystem->Reset();
+                }
+                #endif
                 break;
 
             #ifdef INCLUDE_CLOTH

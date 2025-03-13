@@ -563,7 +563,36 @@ void ParticleSystem::SetupBoxBuffers()
 
 void ParticleSystem::Reset()
 {
+    // blob parameters
+    float particleSpacing = smoothingRadius * 0.7f;
+    int blobSize = (int)ceil(cbrt(size));
+    float blobLength = blobSize * particleSpacing;
 
+    // blob position
+    float blobCenterX = (boxMax.x - boxMin.x) * 0.5f + boxMin.x;
+    float blobCenterY = (boxMax.y - boxMin.y) * 0.5f + boxMin.y;
+    float blobCenterZ = (boxMax.z - boxMin.z) * 0.5f + boxMin.z;
+
+    // reset blob
+    for (int i = 0; i < size; i++)
+    {
+        // grid position
+        int x = i % blobSize;
+        int y = (i / blobSize) % blobSize;
+        int z = (i / (blobSize * blobSize));
+
+        // convert to world position (centered above box center)
+        glm::vec3 position = glm::vec3
+        (
+            blobCenterX - blobLength * 0.5f + x * particleSpacing,
+            blobCenterY - blobLength * 0.5f + y * particleSpacing,
+            blobCenterZ - blobLength * 0.5f + z * particleSpacing
+        );
+
+        particles[i]->SetPosition(position);
+        particles[i]->SetVelocity(glm::vec3(0.0f));
+        particles[i]->SetForce(glm::vec3(0.0f));
+    }
 }
 
 float ParticleSystem::KernelFunction(float r, float h)
