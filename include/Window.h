@@ -67,6 +67,7 @@ public:
 
     // Shader Program
     static GLuint shaderProgram;
+    static GLuint ptShaderProgram;
 
     // Act as Constructors and destructors
     // static bool initializeProgram();

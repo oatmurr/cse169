@@ -149,9 +149,9 @@ int main(int argc, char* argv[])
             glm::vec3 color = glm::vec3(0.0f, 0.5f, 1.0f);
             float smoothingRadius = 0.1f;
             float mass = 0.02f;
-            float restDensity = 1000.0f;
+            float restDensity = 30.0f;
             float viscosity = 0.01f;
-            float gasConstant = 2000.0f;
+            float gasConstant = 1.0f;
             glm::vec3 gravity = glm::vec3(0.0f, -9.81f, 0.0f);
             float boundaryStiffness  = 10000.0f;
             float boundaryDamping = 0.5f;

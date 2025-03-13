@@ -43,6 +43,7 @@ int MouseX, MouseY;
 
 // The shader program id
 GLuint Window::shaderProgram;
+GLuint Window::ptShaderProgram;
 
 // imgui stuff
 #ifdef INCLUDE_SKELETON
@@ -65,6 +66,7 @@ ParticleSystem* Window::particleSystem = nullptr;
 bool Window::initializeProgram(GLFWwindow* window) {
     // Create a shader program with a vertex shader and a fragment shader.
     shaderProgram = LoadShaders("shaders/shader.vert", "shaders/shader.frag");
+    ptShaderProgram = LoadShaders("shaders/point.vert", "shaders/point.frag");
 
     // project 2 lighting stuff
     #ifdef INCLUDE_SKIN
@@ -84,6 +86,11 @@ bool Window::initializeProgram(GLFWwindow* window) {
     // Check the shader program.
     if (!shaderProgram) {
         std::cerr << "Failed to initialize shader program" << std::endl;
+        return false;
+    }
+
+    if (!ptShaderProgram) {
+        std::cerr << "Failed to initialize point shader program" << std::endl;
         return false;
     }
 
@@ -165,6 +172,7 @@ void Window::cleanUp() {
 
     // Delete the shader program.
     glDeleteProgram(shaderProgram);
+    glDeleteProgram(ptShaderProgram);
 
     // imgui stuff
     ImGui_ImplOpenGL3_Shutdown();
@@ -335,6 +343,12 @@ void Window::displayCallback(GLFWwindow* window) {
     #ifdef INCLUDE_CLOTH
     if (cloth) {
         cloth->Draw(Cam->GetViewProjectMtx(), Window::shaderProgram);
+    }
+    #endif
+
+    #ifdef INCLUDE_SPH
+    if (particleSystem) {
+        particleSystem->Draw(Cam->GetViewProjectMtx(), Window::ptShaderProgram);
     }
     #endif
 

@@ -20,7 +20,7 @@ ParticleSystem::ParticleSystem(int size, glm::vec3 color, float smoothingRadius,
     this->boxMax = boxMax;
 
     // blob parameters
-    float particleSpacing = smoothingRadius;
+    float particleSpacing = smoothingRadius * 0.7f;
     int blobSize = (int)ceil(cbrt(size));
     float blobLength = blobSize * particleSpacing;
 
@@ -62,6 +62,9 @@ ParticleSystem::ParticleSystem(int size, glm::vec3 color, float smoothingRadius,
         // create particle
         particles[i] = new Particle(position, mass, false);
     }
+
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
 }
 
 ParticleSystem::~ParticleSystem()
@@ -85,14 +88,13 @@ void ParticleSystem::Draw(const glm::mat4& viewProjMtx, GLuint shader)
         positions[i] = particles[i]->GetPosition();
     }
 
-    // Add debug output here
     std::cout << "drawing " << positions.size() << " particles" << std::endl;
     for (int i = 0; i < 5 && i < positions.size(); i++)
     {
         std::cout << "particle " << i << " position: ("
                 << positions[i].x << ", " << positions[i].y << ", " << positions[i].z << ")" << std::endl;
     }
-    
+
     // *** GL jobs ***
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -116,10 +118,20 @@ void ParticleSystem::Draw(const glm::mat4& viewProjMtx, GLuint shader)
     glUniformMatrix4fv(glGetUniformLocation(shader, "viewProj"), 1, false, (float*)&viewProjMtx);
     glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, (float*)&model);
 
+    glUniform3fv(glGetUniformLocation(shader, "particleColor"), 1, &color[0]);
+    glEnable(GL_PROGRAM_POINT_SIZE);
+    glPointSize(30.0f);
+
     // draw points
     glBindVertexArray(VAO);
     glDrawArrays(GL_POINTS, 0, positions.size());
     glBindVertexArray(0);
+
+    GLenum err = glGetError();
+    if (err != GL_NO_ERROR)
+    {
+        std::cout << "OpenGL error after drawing: " << err << std::endl;
+    }
 
     // Unbind the VAO and shader program
     glBindVertexArray(0);
@@ -128,7 +140,7 @@ void ParticleSystem::Draw(const glm::mat4& viewProjMtx, GLuint shader)
 
 void ParticleSystem::Update()
 {   
-    float dt = 0.01f;
+    float dt = 0.001f;
 
     ComputeDensityPressure();
     ComputeForces();
@@ -181,12 +193,12 @@ void ParticleSystem::ComputeDensityPressure()
         // ensure pressure is not negative
         if (pi->GetPressure() < 0.0f)
         {
-            std::cout << "ParticleSystem::computeDensityPressure - negative pressure" << std::endl;
+            // std::cout << "ParticleSystem::computeDensityPressure - negative pressure" << std::endl;
             pi->SetPressure(0.0f);
         }
 
-        std::cout << "particle " << i << " density: " << density 
-                  << " (rest: " << restDensity << ")" << std::endl;
+        // std::cout << "particle " << i << " density: " << density 
+        //           << " (rest: " << restDensity << ")" << std::endl;
     }
 }
 void ParticleSystem::ComputeForces()
@@ -455,10 +467,10 @@ void ParticleSystem::HandleBoundaryConditions(float dt)
             }
         }
 
+        p->ApplyForce(force);
+        
         // enforce hard boundaries as fallback to prevent particles from escaping
         EnforceHardBoundaries(p);
-        
-        p->ApplyForce(force);
     }
 }
 

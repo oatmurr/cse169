@@ -24,7 +24,7 @@ out vec4 fragColor;
 
 void main()
 {
-
+	
 	// Compute irradiance (sum of ambient & direct lighting)
 	// vec3 irradiance = AmbientColor + LightColor * max(0, dot(LightDirection, fragNormal));
 
