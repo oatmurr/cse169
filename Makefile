@@ -37,6 +37,11 @@ CLOTH_OBJS = $(OBJDIR)/main.o $(OBJDIR)/Camera.o $(OBJDIR)/Cube.o \
              $(OBJDIR)/Shader.o $(OBJDIR)/Tokenizer.o $(OBJDIR)/Window.o \
              $(OBJDIR)/Particle.o $(OBJDIR)/SpringDamper.o $(OBJDIR)/ClothTriangle.o $(OBJDIR)/Cloth.o
 
+# project 5 - smooth particle hydrodynamics
+SPH_OBJS = $(OBJDIR)/main.o $(OBJDIR)/Camera.o $(OBJDIR)/Cube.o \
+		   $(OBJDIR)/Shader.o $(OBJDIR)/Tokenizer.o $(OBJDIR)/Window.o \
+		   $(OBJDIR)/Particle.o $(OBJDIR)/ParticleSystem.o
+
 # .DEFAULT_GOAL := all
 # all: menv
 # menv: $(ANIMATION_OBJS) $(IMGUI_OBJS)
@@ -46,6 +51,7 @@ SKELETON_DEFS = -DINCLUDE_SKELETON
 SKIN_DEFS = -DINCLUDE_SKELETON -DINCLUDE_SKIN
 ANIMATION_DEFS = -DINCLUDE_SKELETON -DINCLUDE_SKIN -DINCLUDE_ANIMATION
 CLOTH_DEFS = -DINCLUDE_CLOTH
+SPH_DEFS = -DINCLUDE_SPH
 
 skeleton: CFLAGS += $(SKELETON_DEFS)
 skeleton: $(SKELETON_OBJS) $(IMGUI_OBJS)
@@ -62,6 +68,10 @@ animation: $(ANIMATION_OBJS) $(IMGUI_OBJS)
 cloth: CFLAGS += $(CLOTH_DEFS)
 cloth: $(CLOTH_OBJS) $(IMGUI_OBJS)
 	$(CC) -o menv $(CLOTH_OBJS) $(IMGUI_OBJS) $(LDFLAGS)
+
+sph: CFLAGS += $(SPH_DEFS)
+sph: $(SPH_OBJS) $(IMGUI_OBJS)
+	$(CC) -o menv $(SPH_OBJS) $(IMGUI_OBJS) $(LDFLAGS)
 
 # project 1 - skeleton
 $(OBJDIR)/main.o: main.cpp include/Window.h | $(OBJDIR)
@@ -154,6 +164,10 @@ $(OBJDIR)/ClothTriangle.o: src/ClothTriangle.cpp include/ClothTriangle.h | $(OBJ
 
 $(OBJDIR)/Cloth.o: src/Cloth.cpp include/Cloth.h | $(OBJDIR)
 	$(CC) $(CFLAGS) $(INCFLAGS) -c src/Cloth.cpp -o $(OBJDIR)/Cloth.o
+
+# project 5 - smooth particle hydrodynamics
+$(OBJDIR)/ParticleSystem.o: src/ParticleSystem.cpp include/ParticleSystem.h | $(OBJDIR)
+	$(CC) $(CFLAGS) $(INCFLAGS) -c src/ParticleSystem.cpp -o $(OBJDIR)/ParticleSystem.o
 
 
 clean:

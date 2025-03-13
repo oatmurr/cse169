@@ -20,6 +20,10 @@
 #include "Cloth.h"
 #endif
 
+#ifdef INCLUDE_SPH
+#include "ParticleSystem.h"
+#endif
+
 // imgui stuff
 #include "imgui/imgui.h"
 #include "backends/imgui_impl_glfw.h"
@@ -55,6 +59,10 @@ public:
     static glm::vec3 wind;
     static bool pauseSimulation;
     static void RenderClothControls();
+    #endif
+
+    #ifdef INCLUDE_SPH
+    static ParticleSystem* particleSystem;
     #endif
 
     // Shader Program

@@ -56,6 +56,10 @@ glm::vec3 Window::wind = glm::vec3(0.0f, 0.0f, 0.0f);
 bool Window::pauseSimulation = false;
 #endif
 
+#ifdef INCLUDE_SPH
+ParticleSystem* Window::particleSystem = nullptr;
+#endif
+
 // Constructors and desctructors
 // bool Window::initializeProgram() {
 bool Window::initializeProgram(GLFWwindow* window) {
@@ -126,6 +130,10 @@ bool Window::initializeObjects() {
     cloth = nullptr;
     #endif
 
+    #ifdef INCLUDE_SPH
+    particleSystem = nullptr;
+    #endif
+
     return true;
 }
 
@@ -149,6 +157,10 @@ void Window::cleanUp() {
 
     #ifdef INCLUDE_CLOTH
     delete cloth;
+    #endif
+
+    #ifdef INCLUDE_SPH
+    delete particleSystem;
     #endif
 
     // Delete the shader program.
@@ -278,6 +290,12 @@ void Window::idleCallback() {
     if (cloth && !pauseSimulation) {
         cloth->SetWind(wind);
         cloth->Simulate(0.002);
+    }
+    #endif
+
+    #ifdef INCLUDE_SPH
+    if (particleSystem) {
+        particleSystem->Update();
     }
     #endif
 }

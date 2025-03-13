@@ -30,20 +30,20 @@ void Particle::Integrate(float dt)
         // symplectic euler integration to get new position
         position += velocity * dt;
 
-        // ground collision
-        float groundHeight = 0.0f;
-        if (position.y < groundHeight)
-        {
-            // push particle to surface
-            position.y = groundHeight;
+        // // ground collision
+        // float groundHeight = 0.0f;
+        // if (position.y < groundHeight)
+        // {
+        //     // push particle to surface
+        //     position.y = groundHeight;
 
-            // apply restitution (ε ≈ 0.05)
-            velocity.y *= -0.05f;
+        //     // apply restitution (ε ≈ 0.05)
+        //     velocity.y *= -0.05f;
 
-            // apply friction (μ ≈ 0.5)
-            velocity.x *= 0.5f;
-            velocity.z *= 0.5f;
-        }
+        //     // apply friction (μ ≈ 0.5)
+        //     velocity.x *= 0.5f;
+        //     velocity.z *= 0.5f;
+        // }
     }
 
     // zero force out so next frame will start fresh

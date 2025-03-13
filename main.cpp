@@ -75,6 +75,39 @@ int main(int argc, char* argv[])
     {
         std::string filename = argv[1];
 
+        #ifdef INCLUDE_SKELETON
+        // if there is a .skel file
+        if ((filename.find(".skel") != std::string::npos) && Window::skeleton)
+        {
+            Window::skeleton->Load(argv[1]);
+            Window::skeleton->PopulateJointList();
+
+            #ifdef INCLUDE_SKIN
+            // if there is a .skel file and a .skin file
+            if (argc > 2 && Window::skin)
+            {
+                Window::skin->Load(argv[2], Window::skeleton);
+
+                #ifdef INCLUDE_ANIMATION
+                // if there is a .skel file, a .skin file, and a .anim file
+                if (argc > 3 && Window::clip)
+                {
+                    Window::clip->Load(argv[3]);
+                }
+                #endif
+            }
+            #endif
+        }
+        #endif
+
+        #ifdef INCLUDE_SKIN
+        // if there is a .skin file but no .skel file
+        if ((filename.find(".skin") != std::string::npos) && Window::skin)
+        {
+            Window::skin->Load(argv[1], nullptr);
+        }
+        #endif
+
         #ifdef INCLUDE_CLOTH
         if (filename == "-cloth")
         {
@@ -108,36 +141,40 @@ int main(int argc, char* argv[])
         }
         #endif
 
-        #ifdef INCLUDE_SKELETON
-        // if there is a .skel file
-        if ((filename.find(".skel") != std::string::npos) && Window::skeleton)
+        #ifdef INCLUDE_SPH
+        if (filename == "-sph")
         {
-            Window::skeleton->Load(argv[1]);
-            Window::skeleton->PopulateJointList();
+            // default sph
+            int size = 1000;
+            glm::vec3 color = glm::vec3(0.0f, 0.5f, 1.0f);
+            float smoothingRadius = 0.1f;
+            float mass = 0.02f;
+            float restDensity = 1000.0f;
+            float viscosity = 0.01f;
+            float gasConstant = 2000.0f;
+            glm::vec3 gravity = glm::vec3(0.0f, -9.81f, 0.0f);
+            float boundaryStiffness  = 10000.0f;
+            float boundaryDamping = 0.5f;
+            glm::vec3 boxMin = glm::vec3(-1.0f, -1.0f, -1.0f);
+            glm::vec3 boxMax = glm::vec3(1.0f, 1.0f, 1.0f);
 
-            #ifdef INCLUDE_SKIN
-            // if there is a .skel file and a .skin file
-            if (argc > 2 && Window::skin)
+            // parse additional parameters if provided
+
+            Window::particleSystem = new ParticleSystem
+            (
+                size, color, smoothingRadius, mass, restDensity,
+                viscosity, gasConstant, gravity, boundaryStiffness,
+                boundaryDamping, boxMin, boxMax
+            );
+
+            if (Window::particleSystem)
             {
-                Window::skin->Load(argv[2], Window::skeleton);
-
-                #ifdef INCLUDE_ANIMATION
-                // if there is a .skel file, a .skin file, and a .anim file
-                if (argc > 3 && Window::clip)
-                {
-                    Window::clip->Load(argv[3]);
-                }
-                #endif
+                std::cout << "particle system created with size: " << size << std::endl;
             }
-            #endif
-        }
-        #endif
-
-        #ifdef INCLUDE_SKIN
-        // if there is a .skin file but no .skel file
-        if ((filename.find(".skin") != std::string::npos) && Window::skin)
-        {
-            Window::skin->Load(argv[1], nullptr);
+            else
+            {
+                std::cout << "failed to create particle system!" << std::endl;
+            }
         }
         #endif
     }

@@ -10,17 +10,26 @@ public:
     glm::mat4 model = glm::mat4(1.0f);
     glm::vec3 color;
 
-    // SPH stuff
+    // ----- SPH PARAMETERS -----
+    // radius of influence around each particle (m)
     float smoothingRadius;
+    // mass of each particle (kg)
     float mass;
+    // rest density of fluid (kg/m^3)
     float restDensity;
+    // viscosity coefficient (Pa * s)
     float viscosity;
+    // gas constant in pressure equation(m^2/s^2)
     float gasConstant;
+    // gravitational acceleration (m/s^2)
     glm::vec3 gravity;
 
-    // boundary
+    // ----- BOUNDARY CONDITIONS -----
+    // stiffness of boundary (N/m)
     float boundaryStiffness;
+    // damping of boundary
     float boundaryDamping;
+    // minimum and maximum coordinates of bounding box (m)
     glm::vec3 boxMin;
     glm::vec3 boxMax;
 

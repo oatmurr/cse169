@@ -18,6 +18,50 @@ ParticleSystem::ParticleSystem(int size, glm::vec3 color, float smoothingRadius,
     this->boundaryDamping = boundaryDamping;
     this->boxMin = boxMin;
     this->boxMax = boxMax;
+
+    // blob parameters
+    float particleSpacing = smoothingRadius;
+    int blobSize = (int)ceil(cbrt(size));
+    float blobLength = blobSize * particleSpacing;
+
+    // blob position
+    float blobCenterX = (boxMax.x - boxMin.x) * 0.5f + boxMin.x;
+    float blobCenterY = (boxMax.y - boxMin.y) * 0.5f + boxMin.y;
+    float blobCenterZ = (boxMax.z - boxMin.z) * 0.5f + boxMin.z;
+
+    // check if blob fits within boundaries
+    if (blobCenterX - blobLength * 0.5f <= boxMin.x || blobCenterX + blobLength * 0.5f > boxMax.x)
+    {
+        std::cout << "blob exceeds x-boundary: length = " << blobLength << ", box x-bounds = [" << boxMin.x << ", " << boxMax.x << "]" << std::endl;
+    }
+    if (blobCenterY - blobLength * 0.5f <= boxMin.y || blobCenterY + blobLength * 0.5f > boxMax.y)
+    {
+        std::cout << "blob exceeds y-boundary: length = " << blobLength << ", box y-bounds = [" << boxMin.y << ", " << boxMax.y << "]" << std::endl;
+    }
+    if (blobCenterZ - blobLength * 0.5f <= boxMin.z || blobCenterZ + blobLength * 0.5f > boxMax.z)
+    {
+        std::cout << "blob exceeds z-boundary: length = " << blobLength << ", box z-bounds = [" << boxMin.z << ", " << boxMax.z << "]" << std::endl;
+    }
+
+    // create blob
+    for (int i = 0; i < size; i++)
+    {
+        // grid position
+        int x = i % blobSize;
+        int y = (i / blobSize) % blobSize;
+        int z = (i / (blobSize * blobSize));
+
+        // convert to world position (centered above box center)
+        glm::vec3 position = glm::vec3
+        (
+            blobCenterX - blobLength * 0.5f + x * particleSpacing,
+            blobCenterY - blobLength * 0.5f + y * particleSpacing,
+            blobCenterZ - blobLength * 0.5f + z * particleSpacing
+        );
+
+        // create particle
+        particles[i] = new Particle(position, mass, false);
+    }
 }
 
 ParticleSystem::~ParticleSystem()
@@ -34,6 +78,21 @@ ParticleSystem::~ParticleSystem()
 
 void ParticleSystem::Draw(const glm::mat4& viewProjMtx, GLuint shader)
 {
+    // create buffer of positions
+    std::vector<glm::vec3> positions(size);
+    for (int i = 0; i < size; i++)
+    {
+        positions[i] = particles[i]->GetPosition();
+    }
+
+    // Add debug output here
+    std::cout << "drawing " << positions.size() << " particles" << std::endl;
+    for (int i = 0; i < 5 && i < positions.size(); i++)
+    {
+        std::cout << "particle " << i << " position: ("
+                << positions[i].x << ", " << positions[i].y << ", " << positions[i].z << ")" << std::endl;
+    }
+    
     // *** GL jobs ***
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -42,7 +101,7 @@ void ParticleSystem::Draw(const glm::mat4& viewProjMtx, GLuint shader)
 
     // Bind to VBO
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, particles.size() * sizeof(glm::vec3), particles.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(glm::vec3), positions.data(), GL_STATIC_DRAW);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), 0);
 
@@ -59,7 +118,7 @@ void ParticleSystem::Draw(const glm::mat4& viewProjMtx, GLuint shader)
 
     // draw points
     glBindVertexArray(VAO);
-    glDrawArrays(GL_POINTS, 0, particles.size());
+    glDrawArrays(GL_POINTS, 0, positions.size());
     glBindVertexArray(0);
 
     // Unbind the VAO and shader program
@@ -80,8 +139,9 @@ void ParticleSystem::Update()
 void ParticleSystem::ComputeDensityPressure()
 {
     // compute density and pressure for each particle
-    for (Particle* pi : particles)
+    for (int i = 0; i < particles.size(); i++)
     {   
+        Particle* pi = particles[i];
         // reset density
         float density = 0.0f;
 
@@ -124,9 +184,11 @@ void ParticleSystem::ComputeDensityPressure()
             std::cout << "ParticleSystem::computeDensityPressure - negative pressure" << std::endl;
             pi->SetPressure(0.0f);
         }
+
+        std::cout << "particle " << i << " density: " << density 
+                  << " (rest: " << restDensity << ")" << std::endl;
     }
 }
-
 void ParticleSystem::ComputeForces()
 {
     // compute forces for each particle (pressure, viscosity, gravity)
@@ -172,6 +234,8 @@ void ParticleSystem::ComputeForces()
             }
         }
 
+        // sum of all forces: navier-stokes equation in lagrangian form
+        // dv/dt = -∇p/ρ + μ∇²v/ρ + g
         glm::vec3 totalForce = pressureForce + viscosityForce + gravityForce;
 
         pi->ApplyForce(totalForce);
@@ -393,6 +457,8 @@ void ParticleSystem::HandleBoundaryConditions(float dt)
 
         // enforce hard boundaries as fallback to prevent particles from escaping
         EnforceHardBoundaries(p);
+        
+        p->ApplyForce(force);
     }
 }
 
