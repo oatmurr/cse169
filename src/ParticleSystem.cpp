@@ -1,9 +1,11 @@
 #include "ParticleSystem.h"
 
-ParticleSystem::ParticleSystem(int size, glm::vec3 color, float smoothingRadius, float mass, float restDensity, float viscosity, float gasConstant, glm::vec3 gravity, float boundaryStiffness, float boundaryDamping, glm::vec3 boxMin, glm::vec3 boxMax)
+ParticleSystem::ParticleSystem(int size, float dt, glm::vec3 color, float smoothingRadius, float mass, float restDensity, float viscosity, float gasConstant, glm::vec3 gravity, float boundaryStiffness, float boundaryDamping, glm::vec3 boxMin, glm::vec3 boxMax)
 {
     this->size = size;
     this->particles = std::vector<Particle*>(size);
+
+    this->dt = dt;
 
     this->color = color;
 
@@ -59,13 +61,19 @@ ParticleSystem::ParticleSystem(int size, glm::vec3 color, float smoothingRadius,
             blobCenterZ - blobLength * 0.5f + z * particleSpacing
         );
 
-        // create particle with small random velocity
+        // random position
+        // position.x += ((float)rand() / RAND_MAX * 0.02f - 0.01f) * particleSpacing;
+        // position.y += ((float)rand() / RAND_MAX * 0.02f - 0.01f) * particleSpacing;
+        // position.z += ((float)rand() / RAND_MAX * 0.02f - 0.01f) * particleSpacing;
+
+        // random velocity
         // glm::vec3 randomVelocity
         // (
         //     (float)rand() / RAND_MAX * 0.1f - 0.05f,
         //     (float)rand() / RAND_MAX * 0.1f - 0.05f,
         //     (float)rand() / RAND_MAX * 0.1f - 0.05f
         // );
+
         particles[i] = new Particle(position, mass, false);
         // particles[i]->SetVelocity(randomVelocity);
     }
@@ -174,8 +182,6 @@ void ParticleSystem::DrawBoundaries(const glm::mat4& viewProjMtx, GLuint shader)
 
 void ParticleSystem::Update()
 {   
-    float dt = 0.001f;
-
     ComputeDensityPressure();
     ComputeForces();
     Integrate(dt);
@@ -221,6 +227,7 @@ void ParticleSystem::ComputeDensityPressure()
         // tait equation of state for water (γ = 7): pi = k[(ρ/ρ₀)^γ - 1]
         // from section 1.3 of "SPH Fluids in Computer Graphics" by Ihmsen et al. 2014
         float pressure = gasConstant * (pow(density / restDensity, 7.0f) - 1.0f);
+        // float pressure = gasConstant * (density - restDensity);
 
         pi->SetPressure(pressure);
 
@@ -232,11 +239,16 @@ void ParticleSystem::ComputeDensityPressure()
         }
 
         // std::cout << "particle " << i << " density: " << density 
-        //           << " (rest: " << restDensity << ")" << std::endl;
+        //           << " (rest: " << restDensity << "), " << "pressure: " << pressure << std::endl;
     }
 }
 void ParticleSystem::ComputeForces()
 {
+    // for debug
+    float maxPressureX = 0.0f, maxPressureY = 0.0f, maxPressureZ = 0.0f;
+    float maxViscosityX = 0.0f, maxViscosityY = 0.0f, maxViscosityZ = 0.0f;
+    float maxTotalX = 0.0f, maxTotalY = 0.0f, maxTotalZ = 0.0f;
+    
     // compute forces for each particle (pressure, viscosity, gravity)
     for (Particle* pi : particles)
     {
@@ -280,9 +292,39 @@ void ParticleSystem::ComputeForces()
             }
         }
 
+        // for debug
+        maxPressureX = glm::max(maxPressureX, glm::abs(pressureForce.x));
+        maxPressureY = glm::max(maxPressureY, glm::abs(pressureForce.y));
+        maxPressureZ = glm::max(maxPressureZ, glm::abs(pressureForce.z));
+
+        maxViscosityX = glm::max(maxViscosityX, glm::abs(viscosityForce.x));
+        maxViscosityY = glm::max(maxViscosityY, glm::abs(viscosityForce.y));
+        maxViscosityZ = glm::max(maxViscosityZ, glm::abs(viscosityForce.z));
+
         // sum of all forces: navier-stokes equation in lagrangian form
         // dv/dt = -∇p/ρ + μ∇²v/ρ + g
         glm::vec3 totalForce = pressureForce + viscosityForce + gravityForce;
+
+        // for debug
+        maxTotalX = glm::max(maxTotalX, glm::abs(totalForce.x));
+        maxTotalY = glm::max(maxTotalY, glm::abs(totalForce.y));
+        maxTotalZ = glm::max(maxTotalZ, glm::abs(totalForce.z));
+
+        // print debug
+        // std::cout << "===== SAMPLE PARTICLE FORCES =====" << std::endl;
+        // std::cout << "Pressure Force: (" << pressureForce.x << ", " 
+        //             << pressureForce.y << ", " << pressureForce.z << ")" << std::endl;
+        // std::cout << "Viscosity Force: (" << viscosityForce.x << ", " 
+        //             << viscosityForce.y << ", " << viscosityForce.z << ")" << std::endl;
+        // std::cout << "Gravity Force: (" << gravityForce.x << ", " 
+        //             << gravityForce.y << ", " << gravityForce.z << ")" << std::endl;
+        // std::cout << "Total Force: (" << totalForce.x << ", " 
+        //             << totalForce.y << ", " << totalForce.z << ")" << std::endl;
+        // std::cout << "Position: (" << pi->GetPosition().x << ", " 
+        //             << pi->GetPosition().y << ", " << pi->GetPosition().z << ")" << std::endl;
+        // std::cout << "Velocity: (" << pi->GetVelocity().x << ", " 
+        //             << pi->GetVelocity().y << ", " << pi->GetVelocity().z << ")" << std::endl;
+        // std::cout << "=================================" << std::endl;
 
         pi->ApplyForce(totalForce);
     }
@@ -405,7 +447,7 @@ void ParticleSystem::EnforceHardBoundaries(Particle* p)
 
 glm::vec3 ParticleSystem::CalculateLennardJonesForce(glm::vec3 position, float boundary, int axis, bool isMin, float epsilon, float sigma, float d_max)
 {
-    glm::vec3 force = glm::vec3(0.0f);
+    glm::vec3 F_LJ = glm::vec3(0.0f);
 
     // calculate distance to boundary (min/max set by isMin)
     float distance;
@@ -421,7 +463,7 @@ glm::vec3 ParticleSystem::CalculateLennardJonesForce(glm::vec3 position, float b
     }
 
     // apply force only within interaction range
-    if (distance < d_max && distance > -d_max)
+    if (fabs(distance) < d_max)
     {
         // r = distance from boundary
         float r = fabs(distance);
@@ -436,19 +478,40 @@ glm::vec3 ParticleSystem::CalculateLennardJonesForce(glm::vec3 position, float b
         // r̂ = direction vector pointing away from boundary
         glm::vec3 r_hat = glm::vec3(0.0f);
         
-        if (r < 0.0f)
+        // for minimum boundary
+        if (isMin)
         {
-            // negative r̂ if outside boundary
-            r_hat[axis] = -1.0f;
+            if (r < 0.0f)
+            {
+                // particle outside minimum boundary, force points inward (positive direction)
+                r_hat[axis] = 1.0f;
+            }
+            else
+            {
+                // particle inside minimum boundary, force points outward (negative direction)
+                r_hat[axis] = -1.0f;
+            }
         }
+        // for maximum boundary
         else
         {
-            // positive r̂ if inside boundary
-            r_hat[axis] = 1.0f;
+            if (r < 0.0f)
+            {
+                // particle outside maximum boundary, force points inward (negative direction)
+                r_hat[axis] = -1.0f;
+            }
+            else
+            {
+                // particle inside maximum boundary, force points outward (positive direction)
+                r_hat[axis] = 1.0f;
+            }
         }
+
         // F_LJ = ε * [(12σ¹²)/(r¹³) - (6σ⁶)/(r⁷)] * r̂
-        glm::vec3 F_LJ = totalForce * r_hat;
+        F_LJ = totalForce * r_hat;
     }
+
+    return F_LJ;
 }
 
 void ParticleSystem::SetupBoxBuffers()
@@ -527,7 +590,14 @@ float ParticleSystem::KernelFunction(float r, float h)
 
 glm::vec3 ParticleSystem::KernelGradient(glm::vec3 r, float h)
 {
-    float q = glm::length(r) / h;
+    float r_length = glm::length(r);
+
+    if (r_length < 0.0001)
+    {
+        return glm::vec3(0.0f);
+    }
+    
+    float q = r_length / h;
 
     float gradientMagnitude = 0.0f;
 
@@ -544,7 +614,9 @@ glm::vec3 ParticleSystem::KernelGradient(glm::vec3 r, float h)
         gradientMagnitude = coefficient * (-0.5f) * std::pow(2.0f - q, 2.0f);
     }
 
-    return gradientMagnitude * glm::normalize(r);
+    glm::vec3 direction = r / r_length;
+
+    return gradientMagnitude * direction;
 }
 
 float ParticleSystem::KernelLaplacian(float r, float h)

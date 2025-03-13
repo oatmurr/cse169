@@ -13,6 +13,7 @@ public:
     GLuint boxVAO, boxVBO;
 
     // ----- SPH PARAMETERS -----
+    float dt;
     // radius of influence around each particle (m)
     float smoothingRadius;
     // mass of each particle (kg)
@@ -40,7 +41,7 @@ public:
     std::vector<Particle*> particles;
 
     // constructor/destructor
-    ParticleSystem(int size, glm::vec3 color, float smoothingRadius, float mass, float restDensity, float viscosity, float gasConstant, glm::vec3 gravity, float boundaryStiffness, float boundaryDamping, glm::vec3 boxMin, glm::vec3 boxMax);
+    ParticleSystem(int size, float dt, glm::vec3 color, float smoothingRadius, float mass, float restDensity, float viscosity, float gasConstant, glm::vec3 gravity, float boundaryStiffness, float boundaryDamping, glm::vec3 boxMin, glm::vec3 boxMax);
     ~ParticleSystem();
 
     // core

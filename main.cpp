@@ -145,24 +145,37 @@ int main(int argc, char* argv[])
         if (filename == "-sph")
         {
             // default sph
+            // ./menv -sph 1000 0.001 0.1 0.5 1000.0 0.01 2000.0 10000.0 0.5 -2.0 -2.0 -2.0 2.0 2.0 2.0
             int size = 1000;
+            float dt = 0.005f;
             glm::vec3 color = glm::vec3(0.0f, 0.5f, 1.0f);
             float smoothingRadius = 0.1f;
-            float mass = 0.02f;
+            float mass = 0.25f;
             float restDensity = 1000.0f;
             float viscosity = 0.01f;
             float gasConstant = 2000.0f;
             glm::vec3 gravity = glm::vec3(0.0f, -9.81f, 0.0f);
             float boundaryStiffness  = 10000.0f;
             float boundaryDamping = 0.5f;
-            glm::vec3 boxMin = glm::vec3(-1.0f, -1.0f, -1.0f);
-            glm::vec3 boxMax = glm::vec3(1.0f, 1.0f, 1.0f);
+            glm::vec3 boxMin = glm::vec3(-2.0f, -2.0f, -2.0f);
+            glm::vec3 boxMax = glm::vec3(2.0f, 2.0f, 2.0f);
 
             // parse additional parameters if provided
-
+            if (argc > 2) size = std::stoi(argv[2]);
+            if (argc > 3) dt = std::stof(argv[3]);
+            if (argc > 4) smoothingRadius = std::stof(argv[4]);
+            if (argc > 5) mass = std::stof(argv[5]);
+            if (argc > 6) restDensity = std::stof(argv[6]);
+            if (argc > 7) viscosity = std::stof(argv[7]);
+            if (argc > 8) gasConstant = std::stof(argv[8]);
+            if (argc > 9) boundaryStiffness = std::stof(argv[9]);
+            if (argc > 10) boundaryDamping = std::stof(argv[10]);
+            if (argc > 11) boxMin = glm::vec3(std::stof(argv[11]), std::stof(argv[12]), std::stof(argv[13]));
+            if (argc > 14) boxMax = glm::vec3(std::stof(argv[14]), std::stof(argv[15]), std::stof(argv[16]));
+            
             Window::particleSystem = new ParticleSystem
             (
-                size, color, smoothingRadius, mass, restDensity,
+                size, dt, color, smoothingRadius, mass, restDensity,
                 viscosity, gasConstant, gravity, boundaryStiffness,
                 boundaryDamping, boxMin, boxMax
             );
