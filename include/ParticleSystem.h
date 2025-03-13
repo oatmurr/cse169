@@ -10,6 +10,8 @@ public:
     glm::mat4 model = glm::mat4(1.0f);
     glm::vec3 color;
 
+    GLuint boxVAO, boxVBO;
+
     // ----- SPH PARAMETERS -----
     // radius of influence around each particle (m)
     float smoothingRadius;
@@ -50,9 +52,11 @@ public:
     void ComputeForces();
     void Integrate(float dt);
 
-    // boundary handling
+    // boundary
     void HandleBoundaryConditions(float dt);
     void EnforceHardBoundaries(Particle* p);
+    void SetupBoxBuffers();
+    void DrawBoundaries(const glm::mat4& viewProjMtx, GLuint shader);
 
     // ----- KERNELS -----
     // support radius = 2h

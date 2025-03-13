@@ -65,6 +65,9 @@ ParticleSystem::ParticleSystem(int size, glm::vec3 color, float smoothingRadius,
 
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
+
+    boxVAO = 0;
+    boxVBO = 0;
 }
 
 ParticleSystem::~ParticleSystem()
@@ -77,6 +80,12 @@ ParticleSystem::~ParticleSystem()
     // Delete the VBOs and the VAO.
     glDeleteBuffers(1, &VBO);
     glDeleteVertexArrays(1, &VAO);
+
+    if (boxVAO != 0)
+    {
+        glDeleteVertexArrays(1, &boxVAO);
+        glDeleteBuffers(1, &boxVBO);
+    }
 }
 
 void ParticleSystem::Draw(const glm::mat4& viewProjMtx, GLuint shader)
@@ -88,12 +97,12 @@ void ParticleSystem::Draw(const glm::mat4& viewProjMtx, GLuint shader)
         positions[i] = particles[i]->GetPosition();
     }
 
-    std::cout << "drawing " << positions.size() << " particles" << std::endl;
-    for (int i = 0; i < 5 && i < positions.size(); i++)
-    {
-        std::cout << "particle " << i << " position: ("
-                << positions[i].x << ", " << positions[i].y << ", " << positions[i].z << ")" << std::endl;
-    }
+    // std::cout << "drawing " << positions.size() << " particles" << std::endl;
+    // for (int i = 0; i < 5 && i < positions.size(); i++)
+    // {
+    //     std::cout << "particle " << i << " position: ("
+    //             << positions[i].x << ", " << positions[i].y << ", " << positions[i].z << ")" << std::endl;
+    // }
 
     // *** GL jobs ***
     glGenVertexArrays(1, &VAO);
@@ -118,23 +127,41 @@ void ParticleSystem::Draw(const glm::mat4& viewProjMtx, GLuint shader)
     glUniformMatrix4fv(glGetUniformLocation(shader, "viewProj"), 1, false, (float*)&viewProjMtx);
     glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, (float*)&model);
 
-    glUniform3fv(glGetUniformLocation(shader, "particleColor"), 1, &color[0]);
-    glEnable(GL_PROGRAM_POINT_SIZE);
-    glPointSize(30.0f);
-
     // draw points
     glBindVertexArray(VAO);
     glDrawArrays(GL_POINTS, 0, positions.size());
     glBindVertexArray(0);
 
-    GLenum err = glGetError();
-    if (err != GL_NO_ERROR)
-    {
-        std::cout << "OpenGL error after drawing: " << err << std::endl;
-    }
+    // GLenum err = glGetError();
+    // if (err != GL_NO_ERROR)
+    // {
+    //     std::cout << "OpenGL error after drawing: " << err << std::endl;
+    // }
 
     // Unbind the VAO and shader program
     glBindVertexArray(0);
+    glUseProgram(0);
+}
+
+void ParticleSystem::DrawBoundaries(const glm::mat4& viewProjMtx, GLuint shader)
+{
+    if (boxVAO == 0)
+    {
+        SetupBoxBuffers();
+    }
+
+    glUseProgram(shader);
+
+    glUniformMatrix4fv(glGetUniformLocation(shader, "viewProj"), 1, false, (float*)&viewProjMtx);
+    glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, (float*)&model);
+
+    glUniform3f(glGetUniformLocation(shader, "DiffuseColor"), 1.0f, 0.0f, 0.0f);
+
+    // draw box wireframe
+    glBindVertexArray(boxVAO);
+    glDrawArrays(GL_LINES, 0, 24);
+    glBindVertexArray(0);
+
     glUseProgram(0);
 }
 
@@ -533,6 +560,53 @@ void ParticleSystem::EnforceHardBoundaries(Particle* p)
         p->SetPosition(position);
         p->SetVelocity(velocity);
     }
+}
+
+void ParticleSystem::SetupBoxBuffers()
+{
+    // define 8 vertices of box
+    glm::vec3 vertices[8] =
+    {
+        glm::vec3(boxMin.x, boxMin.y, boxMin.z),
+        glm::vec3(boxMax.x, boxMin.y, boxMin.z),
+        glm::vec3(boxMax.x, boxMax.y, boxMin.z),
+        glm::vec3(boxMin.x, boxMax.y, boxMin.z),
+        glm::vec3(boxMin.x, boxMin.y, boxMax.z),
+        glm::vec3(boxMax.x, boxMin.y, boxMax.z),
+        glm::vec3(boxMax.x, boxMax.y, boxMax.z),
+        glm::vec3(boxMin.x, boxMax.y, boxMax.z)
+    };
+
+    // define 12 edges of box
+    std::vector<glm::vec3> edges =
+    {
+        vertices[0], vertices[1],
+        vertices[1], vertices[2],
+        vertices[2], vertices[3],
+        vertices[3], vertices[0],
+        vertices[4], vertices[5],
+        vertices[5], vertices[6],
+        vertices[6], vertices[7],
+        vertices[7], vertices[4],
+        vertices[0], vertices[4],
+        vertices[1], vertices[5],
+        vertices[2], vertices[6],
+        vertices[3], vertices[7]
+    };
+
+    // create and setup buffers
+    glGenVertexArrays(1, &boxVAO);
+    glGenBuffers(1, &boxVBO);
+
+    glBindVertexArray(boxVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
+    glBufferData(GL_ARRAY_BUFFER, edges.size() * sizeof(glm::vec3), edges.data(), GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindVertexArray(0);
 }
 
 void ParticleSystem::Reset()

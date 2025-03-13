@@ -349,6 +349,7 @@ void Window::displayCallback(GLFWwindow* window) {
     #ifdef INCLUDE_SPH
     if (particleSystem) {
         particleSystem->Draw(Cam->GetViewProjectMtx(), Window::ptShaderProgram);
+        particleSystem->DrawBoundaries(Cam->GetViewProjectMtx(), Window::shaderProgram);
     }
     #endif
 
