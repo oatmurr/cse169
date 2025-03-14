@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
             float dt = 0.005f;
             glm::vec3 color = glm::vec3(0.0f, 0.5f, 1.0f);
             float smoothingRadius = 0.1f;
-            float mass = 0.25f;
+            float mass = (M_PI * smoothingRadius * smoothingRadius * smoothingRadius) / 4.0f;
             float restDensity = 1000.0f;
             float viscosity = 0.01f;
             float gasConstant = 2000.0f;

@@ -22,7 +22,7 @@ ParticleSystem::ParticleSystem(int size, float dt, glm::vec3 color, float smooth
     this->boxMax = boxMax;
 
     // blob parameters
-    float particleSpacing = smoothingRadius * 0.7f;
+    float particleSpacing = smoothingRadius;
     int blobSize = (int)ceil(cbrt(size));
     float blobLength = blobSize * particleSpacing;
 
@@ -62,20 +62,20 @@ ParticleSystem::ParticleSystem(int size, float dt, glm::vec3 color, float smooth
         );
 
         // random position
-        // position.x += ((float)rand() / RAND_MAX * 0.02f - 0.01f) * particleSpacing;
-        // position.y += ((float)rand() / RAND_MAX * 0.02f - 0.01f) * particleSpacing;
-        // position.z += ((float)rand() / RAND_MAX * 0.02f - 0.01f) * particleSpacing;
+        position.x += ((float)rand() / RAND_MAX * 0.02f - 0.01f) * particleSpacing;
+        position.y += ((float)rand() / RAND_MAX * 0.02f - 0.01f) * particleSpacing;
+        position.z += ((float)rand() / RAND_MAX * 0.02f - 0.01f) * particleSpacing;
 
         // random velocity
-        // glm::vec3 randomVelocity
-        // (
-        //     (float)rand() / RAND_MAX * 0.1f - 0.05f,
-        //     (float)rand() / RAND_MAX * 0.1f - 0.05f,
-        //     (float)rand() / RAND_MAX * 0.1f - 0.05f
-        // );
+        glm::vec3 randomVelocity
+        (
+            (float)rand() / RAND_MAX * 0.1f - 0.05f,
+            (float)rand() / RAND_MAX * 0.1f - 0.05f,
+            (float)rand() / RAND_MAX * 0.1f - 0.05f
+        );
 
         particles[i] = new Particle(position, mass, false);
-        // particles[i]->SetVelocity(randomVelocity);
+        particles[i]->SetVelocity(randomVelocity);
     }
 
     glGenVertexArrays(1, &VAO);
@@ -226,17 +226,18 @@ void ParticleSystem::ComputeDensityPressure()
         // ----- PRESSURE -----
         // tait equation of state for water (γ = 7): pi = k[(ρ/ρ₀)^γ - 1]
         // from section 1.3 of "SPH Fluids in Computer Graphics" by Ihmsen et al. 2014
-        float pressure = gasConstant * (pow(density / restDensity, 7.0f) - 1.0f);
+        // float pressure = gasConstant * (pow(density / restDensity, 5.0f) - 1.0f);
+        float pressure = gasConstant * (pow(density / restDensity, 5.0f));
         // float pressure = gasConstant * (density - restDensity);
 
         pi->SetPressure(pressure);
 
         // ensure pressure is not negative
-        if (pi->GetPressure() < 0.0f)
-        {
-            // std::cout << "ParticleSystem::computeDensityPressure - negative pressure" << std::endl;
-            pi->SetPressure(0.0f);
-        }
+        // if (pi->GetPressure() < 0.0f)
+        // {
+        //     // std::cout << "ParticleSystem::computeDensityPressure - negative pressure" << std::endl;
+        //     pi->SetPressure(0.0f);
+        // }
 
         // std::cout << "particle " << i << " density: " << density 
         //           << " (rest: " << restDensity << "), " << "pressure: " << pressure << std::endl;
@@ -346,43 +347,108 @@ void ParticleSystem::HandleBoundaryConditions(float dt)
     // F_LJ(r) = ε * [(12σ¹²)/(r¹³) - (6σ⁶)/(r⁷)] * r̂
     
     // ε = strength of repulsion force
-    float epsilon = 100.0f;
+    // float epsilon = 100.0f;
     // σ = characteristic interaction distance
-    float sigma = smoothingRadius * 0.5f;
+    // float sigma = smoothingRadius * 0.5f;
     // d_max = cutoff distance beyond which force is ignored
-    float d_max = 2.5f * sigma;
+    // float d_max = 2.5f * sigma;
     // r = distance from boundary
     // r̂ = normalised direction vector pointing away from boundary
     
     // from section 4 of "SPH Fluids in Computer Graphics" by Ihmsen et al. 2014
     // "[Mon94, Mon05, MK09] compute distance-based penalty forces, e.g., Lennard-Jones forces which scale polynomially with the distance to the fluid particle."
     // "Generally, these methods require small integration time steps to pro- duce smooth pressure distributions."
-    for (Particle* p : particles)
-    {
-        glm::vec3 position = p->GetPosition();
-        glm::vec3 force = glm::vec3(0.0f);
+    // for (Particle* p : particles)
+    // {
+    //     glm::vec3 position = p->GetPosition();
+    //     glm::vec3 force = glm::vec3(0.0f);
 
-        // x-min boundary
-        force += CalculateLennardJonesForce(position, boxMin.x, 0, true, epsilon, sigma, d_max);
-        // x-max boundary
-        force += CalculateLennardJonesForce(position, boxMax.x, 0, false, epsilon, sigma, d_max);
-        // y-min boundary
-        force += CalculateLennardJonesForce(position, boxMin.y, 1, true, epsilon, sigma, d_max);
-        // y-max boundary
-        force += CalculateLennardJonesForce(position, boxMax.y, 1, false, epsilon, sigma, d_max);
-        // z-min boundary
-        force += CalculateLennardJonesForce(position, boxMin.z, 2, true, epsilon, sigma, d_max);
-        // z-max boundary
-        force += CalculateLennardJonesForce(position, boxMax.z, 2, false, epsilon, sigma, d_max);
+    //     // x-min boundary
+    //     force += CalculateLennardJonesForce(position, boxMin.x, 0, true, epsilon, sigma, d_max);
+    //     // x-max boundary
+    //     force += CalculateLennardJonesForce(position, boxMax.x, 0, false, epsilon, sigma, d_max);
+    //     // y-min boundary
+    //     force += CalculateLennardJonesForce(position, boxMin.y, 1, true, epsilon, sigma, d_max);
+    //     // y-max boundary
+    //     force += CalculateLennardJonesForce(position, boxMax.y, 1, false, epsilon, sigma, d_max);
+    //     // z-min boundary
+    //     force += CalculateLennardJonesForce(position, boxMin.z, 2, true, epsilon, sigma, d_max);
+    //     // z-max boundary
+    //     force += CalculateLennardJonesForce(position, boxMax.z, 2, false, epsilon, sigma, d_max);
 
-        p->ApplyForce(force);
-    }
+    //     p->ApplyForce(force);
+    // }
 
     // ----- HARD BOUNDARY WITH VELOCITY DAMPING -----
     // as a fallback, still enforce hard boundaries to prevent particles from escaping
     // "In order to overcome the issues of penalty-based methods and to have more control on the boundary condition, direct forcing has been proposed in [BTT09]"
     for (Particle* p : particles)
     {
+        glm::vec3 boundaryForce = glm::vec3(0.0f);
+
+        if (p->GetPosition().x < boxMin.x + 0.1f)
+        {
+            boundaryForce.x += boundaryStiffness * (boxMin.x + 0.1 - p->GetPosition().x) * boundaryDamping;
+        }
+        if (p->GetPosition().x > boxMax.x - 0.1f)
+        {
+            boundaryForce.x += boundaryStiffness * (boxMax.x - 0.1 - p->GetPosition().x) * boundaryDamping;
+        }
+        if (p->GetPosition().y < boxMin.y + 0.1f)
+        {
+            boundaryForce.y += boundaryStiffness * (boxMin.y + 0.1 - p->GetPosition().y) * boundaryDamping;
+        }
+        if (p->GetPosition().y > boxMax.y - 0.1f)
+        {
+            boundaryForce.y += boundaryStiffness * (boxMax.y - 0.1 - p->GetPosition().y) * boundaryDamping;
+        }
+        if (p->GetPosition().z < boxMin.z + 0.1f)
+        {
+            boundaryForce.z += boundaryStiffness * (boxMin.z + 0.1 - p->GetPosition().z) * boundaryDamping;
+        }
+        if (p->GetPosition().z > boxMax.z - 0.1f)
+        {
+            boundaryForce.z += boundaryStiffness * (boxMax.z - 0.1 - p->GetPosition().z) * boundaryDamping;
+        }
+
+
+        // if (p->GetPosition().z > boxMax.z)
+        // {
+        //     boundaryForce.z += boundaryStiffness * (boxMax.z - p->GetPosition().z) * boundaryDamping;
+        // }
+
+        // if (p->GetPosition().x < boxMin.x)
+        // {
+        //     boundaryForce.x += boundaryStiffness * (boxMin.x - p->GetPosition().x);
+        // }
+
+        // if (p->GetPosition().x > boxMax.x)
+        // {
+        //     boundaryForce.x += boundaryStiffness * (boxMax.x - p->GetPosition().x);
+        // }
+
+        // if (p->GetPosition().y < boxMin.y)
+        // {
+        //     boundaryForce.y += boundaryStiffness * (boxMin.y - p->GetPosition().y);
+        // }
+
+        // if (p->GetPosition().y > boxMax.y)
+        // {
+        //     boundaryForce.y += boundaryStiffness * (boxMax.y - p->GetPosition().y);
+        // }
+
+        // if (p->GetPosition().z < boxMin.z)
+        // {
+        //     boundaryForce.z += boundaryStiffness * (boxMin.z - p->GetPosition().z);
+        // }
+
+        // if (p->GetPosition().z > boxMax.z)
+        // {
+        //     boundaryForce.z += boundaryStiffness * (boxMax.z - p->GetPosition().z);
+        // }
+
+        p->ApplyForce(boundaryForce);
+
         EnforceHardBoundaries(p);
     }
 }
@@ -564,7 +630,7 @@ void ParticleSystem::SetupBoxBuffers()
 void ParticleSystem::Reset()
 {
     // blob parameters
-    float particleSpacing = smoothingRadius * 0.7f;
+    float particleSpacing = smoothingRadius;
     int blobSize = (int)ceil(cbrt(size));
     float blobLength = blobSize * particleSpacing;
 
